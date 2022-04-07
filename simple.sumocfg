@@ -1,0 +1,8 @@
+<configuration>
+<input>
+<net-file value="melbcbd.net.xml"/>
+<route-files value="routes.rou.xml" />
+<additional-files value="melbcbd.poly.xml" />
+</input>
+</configuration>
+

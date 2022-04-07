@@ -1,0 +1,1 @@
+sudo docker build -f Dockerfile_server --tag=server_example .

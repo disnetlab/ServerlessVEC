@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- generated on 2022-03-23 21:41:33.158174 by randomTrips.py UNKNOWN
+  options: -n melbcbd.net.xml -r routes.rou.xml -o trips.xml -e 5 -p 0.5
+-->
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <trip id="0" depart="0.00" from="532243339#0" to="-460425665#1"/>
+    <trip id="1" depart="0.50" from="428243144" to="240704054#2"/>
+    <trip id="2" depart="1.00" from="6395017#1" to="465991370#1"/>
+    <trip id="3" depart="1.50" from="6450457#2" to="-460425665#2"/>
+    <trip id="4" depart="2.00" from="460425664#3" to="-460425665#1"/>
+    <trip id="5" depart="2.50" from="240704054#2" to="460425665#1"/>
+    <trip id="6" depart="3.00" from="-460425665#1" to="240704054#2"/>
+    <trip id="7" depart="3.50" from="532243339#0" to="460425665#2"/>
+    <trip id="8" depart="4.00" from="240704054#2" to="465799092#1"/>
+    <trip id="9" depart="4.50" from="6395017#2" to="-460425665#1"/>
+</routes>
