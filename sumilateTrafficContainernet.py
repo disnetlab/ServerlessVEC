@@ -15,7 +15,7 @@ from containernet.node import DockerSta
 from containernet.node import Docker
 from containernet.term import makeTerm
 from containernet.link import TCLink
-from mininet.node import Controller
+from mininet.node import RemoteController
 from mn_wifi.node import OVSKernelAP
 
 
@@ -222,8 +222,9 @@ def simulateTraffic( vehiclePositions, sumoNetFile ):
     nearestJnDict = {}
 
     "Create a network."
-    net = Containernet(controller=Controller, link=wmediumd, wmediumd_mode=interference, accessPoint=OVSKernelAP)
-    over_controller=net.addController('over_controller')
+    net = Containernet(controller=RemoteController, link=wmediumd, wmediumd_mode=interference, accessPoint=OVSKernelAP)
+##    over_controller=net.addController('over_controller')
+    over_controller = net.addController('over_controller', controller=RemoteController, ip='192.168.56.101', port=6653 )
 
     #Get Traffic junctions
     access_points = []
@@ -231,8 +232,11 @@ def simulateTraffic( vehiclePositions, sumoNetFile ):
               'encrypt': 'wpa2', 'failMode': 'standalone', 'datapath': 'user'}
     junctions = parseJunctions( sumoNetfile )
 
+    portMap= 9000
+
 
     for count,junctionId in enumerate(junctions.keys()):
+        portMap = portMap + 1
         (posX,posY) = junctions[ junctionId ]
         
         (metX,metY) = translateInMeters(posX, posY)
@@ -242,16 +246,16 @@ def simulateTraffic( vehiclePositions, sumoNetFile ):
         ip_addr = getRandomIPAddress()
 
         apname = "a"+str(count+1)
-        ap = net.addAccessPoint(apname, mac=randomMac, ip = ip_addr, channel='11',
+        ap = net.addAccessPoint(apname, mac=randomMac, ip = ip_addr, channel='11', protocols='OpenFlow13',
                                 position=pos,**kwargs)
 
         randomMac = getRandomMac()
         ip_addr = getRandomIPAddress()
         print("Docker ip = "+ip_addr)
-##        attached_vm = net.addDocker("D_"+apname, mac=randomMac, ip = ip_addr, dcmd='python -m http.server 80', dimage="server_example:latest")
+        attached_vm = net.addDocker("D_"+apname, mac=randomMac, ip = ip_addr, ports=[80], dcmd='python -m http.server --bind 0.0.0.0 80', dimage="server_example:latest")
 ##        attached_vm = net.addHost("D_"+apname, mac=randomMac, ip = ip_addr, cls=Docker, dcmd='python -m http.server 80', dimage="server_example:latest")
 ##        net.addLink(ap, attached_vm)
-        attached_vm = net.addHost("D_"+apname, mac=randomMac, ip = ip_addr)
+##        attached_vm = net.addHost("D_"+apname, mac=randomMac, ip = ip_addr)
         access_points.append((ap,attached_vm))
 
         
@@ -295,9 +299,9 @@ def simulateTraffic( vehiclePositions, sumoNetFile ):
     nodes = net.stations + net.aps
     print(distInMetersBox)
     dist = str(distInMetersBox)
-    net.telemetry(nodes=nodes, data_type='position',
-                  min_x=0, min_y=0,
-                  max_x=2000, max_y=2000)
+##    net.telemetry(nodes=nodes, data_type='position',
+##                  min_x=0, min_y=0,
+##                  max_x=2000, max_y=2000)
 
 
 ##    pdb.set_trace()

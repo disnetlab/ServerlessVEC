@@ -7,6 +7,12 @@ RUN apt update && apt install -y \
         telnet telnetd \
         iperf \
 	curl \
-	iw
+	tcpdump \
+	iw \
+	iproute2 \
+	net-tools \
+	ethtool \
+	wireless-tools 
 COPY index.html /app
-CMD python -m http.server 80 
+EXPOSE 80
+CMD python -m http.server --bind 0.0.0.0 80 
