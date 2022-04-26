@@ -23,40 +23,43 @@ from mn_wifi.node import OVSKernelAP
 from mn_wifi.link import wmediumd, ITSLink
 from mn_wifi.wmediumdConnector import interference
 from mininet.log import setLogLevel
+import pdb
 
 
 
 def topology(args):
 
-    net = Containernet(controller=RemoteController, link=wmediumd, wmediumd_mode=interference, accessPoint=OVSKernelAP)
+    net = Containernet(controller=RemoteController, link=wmediumd, wmediumd_mode=interference, ac_method='ssf')
     c1 = net.addController('c1', controller=RemoteController, ip='192.168.56.101', port=6653 )
 ##
     info("*** Creating nodes\n")
-    ap1 = net.addAccessPoint('ap1', ssid='new-ssid', mode='b', channel='1',ip='10.10.10.2', protocols='OpenFlow13', datapath='user',
+    ap1 = net.addAccessPoint('ap1', ssid='new-ssid', mode='p',ip='10.10.10.2', protocols='OpenFlow13', datapath='kernel',
                              failMode="standalone", mac='00:00:00:00:00:01',
                              position='50,50,0')
-    attached_vm = net.addHost("Dap", mac='00:00:00:00:00:12', ip = '10.10.10.3', cls=Docker, ports=[80], dcmd='python -m http.server --bind 0.0.0.0 80', dimage="server_example:latest")
+    attached_vm = net.addHost("Dap", mac='00:00:00:00:00:12', ip = '10.10.10.3', cls=Docker, ports=[80,8888], dcmd='python -m http.server --bind 0.0.0.0 80', dimage="server_example:latest")
 
     
-    sta1 = net.addStation('sta1',  mode='p',mac='00:00:00:00:00:02', ip='10.10.10.4', cls=DockerSta, ports=[80], dcmd='python -m http.server --bind 0.0.0.0 80', dimage="server_example:latest", 
-                   position='51,50,0')
+    sta1 = net.addStation('sta1',  mode='p',mac='00:00:00:00:00:02', ip='10.10.10.4', cls=DockerSta, ports=[80,8888], dcmd='python -m http.server --bind 0.0.0.0 80', dimage="server_example:latest", 
+                   position='49,50,0')
     
-    sta2 = net.addStation('sta2', mode='p', mac='00:00:00:00:00:03', ip='10.10.10.6', cls=DockerSta, ports=[80], dcmd='python -m http.server --bind 0.0.0.0 80', dimage="server_example:latest", 
+    sta2 = net.addStation('sta2', mode='p', mac='00:00:00:00:00:03', ip='10.10.10.6', cls=DockerSta, ports=[80,8888], dcmd='python -m http.server --bind 0.0.0.0 80', dimage="server_example:latest", 
                    position='49,50,0')
-
-    sta3 = net.addStation('sta3', mac='00:00:44:00:01:03', ip='10.10.10.9', 
-                   position='49,50,0')
-
-    sta4 = net.addStation('sta4', mac='00:00:00:35:00:03', ip='10.10.10.12', 
-                   position='49,50,0')
+##
+##    sta3 = net.addStation('sta3', mac='00:00:44:00:01:03', ip='10.10.10.9', 
+##                   position='49,50,0')
+##
+##    sta4 = net.addStation('sta4', mac='00:00:00:35:00:03', ip='10.10.10.12', 
+##                   position='49,50,0')
 
 
     info("*** Configuring propagation model\n")
     net.setPropagationModel(model="logDistance", exp=4.5)
 
     info("*** Configuring wifi nodes\n")
+    net.setModule('./mac80211_hwsim.ko')
+    
     net.configureWifiNodes()
-    net.addLink(ap1, attached_vm, cls=TCLink)
+    net.addLink(ap1, attached_vm)
 
 
     info("*** Creating links\n")
@@ -78,5 +81,5 @@ def topology(args):
 
 
 if __name__ == '__main__':
-    setLogLevel('debug')
+    setLogLevel('info')
     topology(sys.argv)

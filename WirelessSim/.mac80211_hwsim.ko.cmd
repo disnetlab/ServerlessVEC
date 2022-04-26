@@ -1,0 +1,1 @@
+cmd_/home/wifi/Desktop/SumoFiles/WirelessSim/mac80211_hwsim.ko := ld -r -m elf_x86_64  -z max-page-size=0x200000  --build-id  -T ./scripts/module-common.lds -o /home/wifi/Desktop/SumoFiles/WirelessSim/mac80211_hwsim.ko /home/wifi/Desktop/SumoFiles/WirelessSim/mac80211_hwsim.o /home/wifi/Desktop/SumoFiles/WirelessSim/mac80211_hwsim.mod.o;  true

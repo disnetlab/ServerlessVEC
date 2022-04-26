@@ -1,1 +1,1 @@
-sudo docker build -f Dockerfile_server --tag=server_example .
+sudo docker build -f Dockerfile_server --no-cache  --tag=server_example .

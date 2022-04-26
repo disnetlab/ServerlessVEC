@@ -1,6 +1,6 @@
-FROM python:latest
+FROM python:3.8-slim-buster
 WORKDIR /app
-RUN apt update && apt install -y \
+RUN apt update && apt upgrade -y && apt install -y \
         net-tools \
         iputils-ping \
         iproute2 \
@@ -12,7 +12,18 @@ RUN apt update && apt install -y \
 	iproute2 \
 	net-tools \
 	ethtool \
-	wireless-tools 
+	wireless-tools \
+	openssh-server \
+	iptables \
+	openvswitch-switch
+
 COPY index.html /app
+COPY requirements.txt /app
+COPY testImg.jpg /app
+COPY Client.py /app
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
 EXPOSE 80
-CMD python -m http.server --bind 0.0.0.0 80 
+EXPOSE 8888
+
+

@@ -1,0 +1,13 @@
+ssh -N -4 -f osboxes@192.168.56.103 -g -L 8888:192.168.56.103:5000
+
+Dap sysctl -w net.ipv4.ip_forward=1
+
+Dap iptables -A PREROUTING -t nat  -p tcp --dport 8888 -j DNAT --to-destination 192.168.56.103:5000
+
+Dap iptables -t nat -A POSTROUTING -j MASQUERADE
+
+
+
+
+Temporrarily Not wokring
+Dap iptables -A FORWARD -p tcp -d 192.168.56.103 --dport 5000 -j ACCEPT
