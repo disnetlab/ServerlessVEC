@@ -1,0 +1,1 @@
+sudo docker build -f Dockerfile_Openwrt --no-cache  --tag=openwrt_ex .

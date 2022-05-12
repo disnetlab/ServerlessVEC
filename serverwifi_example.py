@@ -29,20 +29,20 @@ import pdb
 
 def topology(args):
 
-    net = Containernet(controller=RemoteController, link=wmediumd, wmediumd_mode=interference, ac_method='ssf')
+    net = Containernet(controller=RemoteController, link=wmediumd, wmediumd_mode=interference, ac_method='ssf', config4addr=True)
     c1 = net.addController('c1', controller=RemoteController, ip='192.168.56.101', port=6653 )
 ##
     info("*** Creating nodes\n")
-    ap1 = net.addAccessPoint('ap1', ssid='new-ssid', mode='p',ip='10.10.10.2', protocols='OpenFlow13', datapath='kernel',
+    ap1 = net.addAccessPoint('ap1', ssid='new-ssid', mode='b',ip='172.18.5.10/24', protocols='OpenFlow13', datapath='kernel',
                              failMode="standalone", mac='00:00:00:00:00:01',
                              position='50,50,0')
-    attached_vm = net.addHost("Dap", mac='00:00:00:00:00:12', ip = '10.10.10.3', cls=Docker, ports=[80,8888], dcmd='python -m http.server --bind 0.0.0.0 80', dimage="server_example:latest")
+    attached_vm = net.addHost("Dap", mac='00:00:00:00:00:12', ip = '172.18.5.11/24', cls=Docker, ports=[80,8888], dcmd='python -m http.server --bind 0.0.0.0 80', dimage="server_example:latest")
 
     
-    sta1 = net.addStation('sta1',  mode='p',mac='00:00:00:00:00:02', ip='10.10.10.4', cls=DockerSta, ports=[80,8888], dcmd='python -m http.server --bind 0.0.0.0 80', dimage="server_example:latest", 
+    sta1 = net.addStation('sta1',  mode='b',mac='00:00:00:00:00:02', cls=DockerSta, ports=[80,8888], dcmd='python -m http.server --bind 0.0.0.0 80', dimage="server_example:latest", 
                    position='49,50,0')
     
-    sta2 = net.addStation('sta2', mode='p', mac='00:00:00:00:00:03', ip='10.10.10.6', cls=DockerSta, ports=[80,8888], dcmd='python -m http.server --bind 0.0.0.0 80', dimage="server_example:latest", 
+    sta2 = net.addStation('sta2', mode='b', mac='00:00:00:00:00:03', ip='172.18.5.10/24', cls=DockerSta, ports=[80,8888], dcmd='python -m http.server --bind 0.0.0.0 80', dimage="server_example:latest", 
                    position='49,50,0')
 ##
 ##    sta3 = net.addStation('sta3', mac='00:00:44:00:01:03', ip='10.10.10.9', 
@@ -56,7 +56,6 @@ def topology(args):
     net.setPropagationModel(model="logDistance", exp=4.5)
 
     info("*** Configuring wifi nodes\n")
-    net.setModule('./mac80211_hwsim.ko')
     
     net.configureWifiNodes()
     net.addLink(ap1, attached_vm)

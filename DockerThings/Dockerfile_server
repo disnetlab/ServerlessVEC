@@ -15,12 +15,16 @@ RUN apt update && apt upgrade -y && apt install -y \
 	wireless-tools \
 	openssh-server \
 	iptables \
-	openvswitch-switch
+	openvswitch-switch \
+	build-essential \
+	vim
 
 COPY index.html /app
 COPY requirements.txt /app
 COPY testImg.jpg /app
 COPY Client.py /app
+COPY wlan_kabel.c /app
+RUN cc -o wlan_kabel wlan_kabel.c
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 EXPOSE 80

@@ -1,0 +1,11 @@
+sta1 export CTRLIP=192.168.56.101
+sta1 /usr/share/openvswitch/scripts/ovs-ctl start
+sta1 ovs-vsctl add-br br1
+sta1 ifconfig br1 up
+sta1 ovs-vsctl set bridge br1 protocols=OpenFlow13
+sta1 ovs-vsctl set-controller br1 tcp:$CTRLIP:6653
+sta1 ifconfig sta1-wlan0 down
+sta1 ip addr flush dev sta1-wlan0
+sta1 ip addr add 10.10.10.4/8 dev br1
+sta1 ifconfig sta1-wlan0 up 
+
