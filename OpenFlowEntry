@@ -1,0 +1,2 @@
+"table=0,priority=15, dl_dst=00:00:00:00:00:02, dl_type=0x800, action=mod_dl_src:00:00:00:00:00:02"
+ovs-ofctl --protocol=OpenFlow13 add-flow br1 "table=0,priority=15, in_port=2, dl_type=0x800, nw_proto=1, action=mod_dl_src:00:00:00:00:00:02"

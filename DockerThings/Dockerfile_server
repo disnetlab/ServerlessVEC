@@ -17,7 +17,8 @@ RUN apt update && apt upgrade -y && apt install -y \
 	iptables \
 	openvswitch-switch \
 	build-essential \
-	vim
+	vim \
+	python3-pip
 
 COPY index.html /app
 COPY requirements.txt /app
@@ -27,6 +28,7 @@ COPY wlan_kabel.c /app
 RUN cc -o wlan_kabel wlan_kabel.c
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
+RUN pip3 install sshuttle
 EXPOSE 80
 EXPOSE 8888
 

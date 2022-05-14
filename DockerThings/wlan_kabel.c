@@ -107,7 +107,7 @@ static int get_rawsocket(char* iface, int socktype) {
 static int is_forwardable_eth(char * buf, int len) {
 	if (memcmp(destmac,&buf[6],6)!=0) {
 		printmac(&buf[6],"Dropping packet from unauthorized host");
-		return 0;
+		return 1;
 	}
 	return 1;
 }

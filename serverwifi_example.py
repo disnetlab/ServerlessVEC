@@ -29,17 +29,26 @@ import pdb
 
 def topology(args):
 
-    net = Containernet(controller=RemoteController, link=wmediumd, wmediumd_mode=interference, ac_method='ssf', config4addr=True)
+    net = Containernet(controller=RemoteController, link=wmediumd, wmediumd_mode=interference, ac_method='ssf')
     c1 = net.addController('c1', controller=RemoteController, ip='192.168.56.101', port=6653 )
 ##
     info("*** Creating nodes\n")
-    ap1 = net.addAccessPoint('ap1', ssid='new-ssid', mode='b',ip='172.18.5.10/24', protocols='OpenFlow13', datapath='kernel',
+    ap1 = net.addAccessPoint('ap1', ssid='new-ssid', mode='b',ip='172.18.5.13/24', protocols='OpenFlow13', datapath='kernel',
                              failMode="standalone", mac='00:00:00:00:00:01',
                              position='50,50,0')
-    attached_vm = net.addHost("Dap", mac='00:00:00:00:00:12', ip = '172.18.5.11/24', cls=Docker, ports=[80,8888], dcmd='python -m http.server --bind 0.0.0.0 80', dimage="server_example:latest")
+    attached_vm = net.addHost("Dap", mac='00:00:00:00:00:12', ip = '172.18.5.12/24', cls=Docker, ports=[80,8888], dcmd='python -m http.server --bind 0.0.0.0 80', dimage="server_example:latest")
+
+
+
+    ap2 = net.addAccessPoint('ap2', ssid='new-ssid', mode='b',ip='172.18.5.113/24', protocols='OpenFlow13', datapath='kernel',
+                             failMode="standalone", mac='00:00:01:00:00:01',
+                             position='150,150,0')
+    Dap2 = net.addHost("Dap2", mac='00:00:03:00:00:12', ip = '172.18.5.112/24', cls=Docker, ports=[80,8888], dcmd='python -m http.server --bind 0.0.0.0 80', dimage="server_example:latest")
+
+
 
     
-    sta1 = net.addStation('sta1',  mode='b',mac='00:00:00:00:00:02', cls=DockerSta, ports=[80,8888], dcmd='python -m http.server --bind 0.0.0.0 80', dimage="server_example:latest", 
+    sta1 = net.addStation('sta1',  mode='b',mac='06:24:68:41:34:44', ip="172.18.5.11/24", cls=DockerSta, ports=[80,8888], dcmd='python -m http.server --bind 0.0.0.0 80', dimage="server_example:latest", 
                    position='49,50,0')
     
     sta2 = net.addStation('sta2', mode='b', mac='00:00:00:00:00:03', ip='172.18.5.10/24', cls=DockerSta, ports=[80,8888], dcmd='python -m http.server --bind 0.0.0.0 80', dimage="server_example:latest", 
@@ -59,6 +68,8 @@ def topology(args):
     
     net.configureWifiNodes()
     net.addLink(ap1, attached_vm)
+    net.addLink(ap2, Dap2)
+    net.addLink(ap2, ap1)
 
 
     info("*** Creating links\n")
@@ -68,6 +79,7 @@ def topology(args):
     net.build()
     c1.start()
     ap1.start([c1])
+    ap2.start([c1])
     net.start()
 ##    ap2.start([c1])
 
