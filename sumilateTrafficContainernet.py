@@ -50,7 +50,6 @@ def translateInMeters(x, y):
     global ymax
     global screenDim
     global distInMetersBox
-##    print(str(x)+"**"+str(y)+"**"+str(x*distInMetersBox/xmax)+"**"+str(y*distInMetersBox/ymax))
     return(x*distInMetersBox/xmax, y*distInMetersBox/ymax)
     
 
@@ -84,18 +83,6 @@ def simulateTrafficHelp( net, timestep, vehiclePositions, carObjectDict, carColo
         prevTimestep = {}
     else:
         prevTimestep = vehiclePositions [ timestep-1 ]
-
-    #Add a new car
-##    for vehicleId in [x for x in curTimestep.keys() if x not in prevTimestep.keys()]:
-##        posX = float(curTimestep[vehicleId][0])
-##        posY = float(curTimestep[vehicleId][1])
-##        (metX, metY) = translateInMeters (posX, posY)
-##
-##        pos = ','.join([str(x) for x in [metX, metY, 0]])
-##        print("Add==="+vehicleId)
-##        c = net.addCar(vehicleId, wlans=2, position=pos, encrypt=['wpa2', ''])
-##        carObjectDict[ vehicleId ] = c
-
 
     #Delete vehicle , move to 0,0,0,
     for vehicleId in [x for x in prevTimestep.keys() if x not in curTimestep.keys()]:
@@ -165,7 +152,6 @@ def findNearestJunction(posX, posY, junctions):
         if(dist < nearest):
             nearest = dist
             nearestId = junctionId
-
     return nearestId
 
 
@@ -179,7 +165,7 @@ def addAllCars(net, vehiclePositions, carObjectDict):
             randomMac = getRandomMac()
             ip_addr = getRandomIPAddress()
 ##            attached_vm = net.addDocker("D_"+vehicleId, mac=randomMac, ip = ip_addr, dimage="client_example:latest")
-            attached_vm = net.addHost("D_"+vehicleId, mac=randomMac, cls=Docker, ip = ip_addr, dimage="client_example:latest")
+            attached_vm = net.addHost("D_"+vehicleId, mac=randomMac, cls=Docker, ip = ip_addr, dimage="server_example:latest")
             net.addLink(car, attached_vm)
 
             randomMac = getRandomMac()
@@ -210,31 +196,22 @@ def getRandomMac():
     return RANDMAC
 
 
+#This function simulates all the traffic
 def simulateTraffic( vehiclePositions, sumoNetFile ):
     global xmax
     global ymax
     global screenDim
     global distInMetersBox
-    print((xmax))
-
     carObjectDict = {}
     carColorDict = {}
     nearestJnDict = {}
-
-    "Create a network."
     net = Containernet(controller=RemoteController, link=wmediumd, wmediumd_mode=interference, accessPoint=OVSKernelAP)
-##    over_controller=net.addController('over_controller')
     over_controller = net.addController('over_controller', controller=RemoteController, ip='192.168.56.101', port=6653 )
-
-    #Get Traffic junctions
     access_points = []
     kwargs = {'ssid': 'vanet-ssid', 'mode': 'g', 'passwd': '123456789a',
-              'encrypt': 'wpa2', 'failMode': 'standalone', 'datapath': 'user'}
+              'encrypt': 'wpa2', 'failMode': 'standalone', 'datapath': 'kernel'}
     junctions = parseJunctions( sumoNetfile )
-
     portMap= 9000
-
-
     for count,junctionId in enumerate(junctions.keys()):
         portMap = portMap + 1
         (posX,posY) = junctions[ junctionId ]
@@ -248,42 +225,27 @@ def simulateTraffic( vehiclePositions, sumoNetFile ):
         apname = "a"+str(count+1)
         ap = net.addAccessPoint(apname, mac=randomMac, ip = ip_addr, channel='11', protocols='OpenFlow13',
                                 position=pos,**kwargs)
-
         randomMac = getRandomMac()
         ip_addr = getRandomIPAddress()
         print("Docker ip = "+ip_addr)
         attached_vm = net.addDocker("D_"+apname, mac=randomMac, ip = ip_addr, ports=[80], dcmd='python -m http.server --bind 0.0.0.0 80', dimage="server_example:latest")
-##        attached_vm = net.addHost("D_"+apname, mac=randomMac, ip = ip_addr, cls=Docker, dcmd='python -m http.server 80', dimage="server_example:latest")
-##        net.addLink(ap, attached_vm)
-##        attached_vm = net.addHost("D_"+apname, mac=randomMac, ip = ip_addr)
         access_points.append((ap,attached_vm))
-
-        
     addAllCars(net, vehiclePositions, carObjectDict)
-
     print("*** Configuring Propagation Model\n")
     net.setPropagationModel(model="logDistance", exp=2.8)
-
     print("*** Configuring wifi nodes\n")
     net.configureWifiNodes()
-
     #Add all the  connectivity
     numAPs = len(access_points)
     for i in range(numAPs-1):
         for j in range(i+1, numAPs):
             print(str(i)+"----"+str(j))
             net.addLink(access_points[i][0], access_points[j][0])
-
     for aps in access_points:
         ap = aps[0]
         vm = aps[1]
         net.addLink(ap,vm)
-        
-        
-    
-
     info("*** Starting network\n")
-##    net.build()
     over_controller.start()
     net.build()
     for aps in access_points:
@@ -331,11 +293,6 @@ def moveVehicles(net, vehiclePositions,
         simulateTrafficHelp( net, timestep, vehiclePositions,
                                             carObjectDict, carColorDict,  junctions, nearestJnDict )
 
-##        pdb.set_trace()
-##        win.update_idletasks()
-##        win.update()
-    
-
 
 if __name__ == "__main__":
     sumoTracefile = sys.argv[1]
@@ -361,7 +318,6 @@ if __name__ == "__main__":
     print("Parsed Traces")
     xmax = float(xmax_t)
     ymax = float(ymax_t)
-
     print(str(xmax)+"---"+str(ymax))
     
     simulateTraffic( vehiclePositions, sumoNetfile )

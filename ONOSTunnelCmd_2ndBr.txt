@@ -1,0 +1,21 @@
+export CTRLIP=192.168.168.5
+
+export REMOTEIP=192.168.56.116
+
+export TAPIP=172.18.5.8
+
+sudo ovs-vsctl add-br br2
+
+#sudo ovs-vsctl set bridge br2 protocols=OpenFlow13
+
+#sudo ovs-vsctl set-controller br2 tcp:$CTRLIP:6653 
+
+sudo ovs-docker add-port br2 eth1 mn.sta2  
+
+sudo ovs-vsctl add-port br2 tap2 -- set Interface tap2 type=internal
+
+sudo ip addr add $TAPIP/24 dev tap2
+
+sudo ip link set tap2 up
+sudo ovs-vsctl add-port br2 tap3 -- set Interface tap3 type=gre options:remote_ip=$REMOTEIP
+
