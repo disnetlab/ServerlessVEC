@@ -113,32 +113,55 @@ def addTunnelOnStation(stationName):
     wlanInterfaceName=stationName+"-wlan0"
     addTunnelOnStation_help(dockerName, wlanInterfaceName)
 
-def addTunnelOnVM(entityName, TapIP, TapMAC, staOrAP):
-    resources=getResourcesUsedForVM(entityName,staOrAP)
+def addTunnelOnVM(entityName, TapIP, TapMAC):
+    global VMAssociations
+    resources=VMAssociations[entityName]
+    
     VMIP=resources['VM'][0]
     VMUser=resources['VM'][1]
     VMPass=resources['VM'][2]
     RemoteIP=getIPAddress()
     addTunnelOnVM_help(VMIP, VMUser, VMPass, TapIP, TapMAC, RemoteIP)
 
+def addTunnelOnAPBridge(LocalPswd, apName, TapPortName, VMIP):
+    cmdList=[]
+    cmdList.append("sudo ovs-vsctl add-port ap1 %s -- set Interface %s type=gre options:remote_ip=%s" % (TapPortName, TapPortName, VMIP) )
+    for cmd in cmdList:
+        os.system(cmd)
+
+
+
 
 readVMFile()
 
 def addVMToStation(stationName, TapIPlocal, TapIPRemote, TapMAC):
     global LocalPswd
-    global VMAssociations
-    addTunnelOnVM(stationName, TapIPRemote, TapMAC, True)
-    RemoteIP=VMAssociations[stationName]['VM'][0]
-    BrName=VMAssociations[stationName]['BRNAME']
+    resources=getResourcesUsedForVM(stationName,True)
+    addTunnelOnVM(stationName, TapIPRemote, TapMAC)
+    VMIP=resources['VM'][0]
+    BrName=resources['BRNAME']
     print("BrName="+BrName)
-    TapPortName=VMAssociations[stationName]['TAPNAME']
+    TapPortName=resources['TAPNAME']
     dockerName=getDockerName(stationName)
-    connectVMAndDocker(LocalPswd, RemoteIP, BrName, TapPortName, dockerName)
+    connectVMAndDocker(LocalPswd, VMIP, BrName, TapPortName, dockerName)
     addTunnelOnStation(stationName)
 
+def addVMToAP(apName, TapIPRemote):
+    global LocalPswd
+    resources=getResourcesUsedForVM(apName,False)
+    addTunnelOnVM(stationName, TapIPRemote, "")
+    VMIP=resources['VM'][0]
+    TapPortName=resources['TAPNAME']
+    addTunnelOnAPBridge(LocalPswd, apName, TapPortName, VMIP) 
+
+
+    
 
 addVMToStation("sta1", "172.18.5.6", "172.18.5.5", "00:00:00:00:00:02")
 addVMToStation("sta2", "172.18.5.7", "172.18.5.8", "00:00:00:00:00:03")
+
+
+
 
 
 ##addTunnelOnVM("sta1","172.18.5.6", "00:00:00:00:00:02", True)
