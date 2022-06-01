@@ -1,5 +1,6 @@
-FROM python:3.8-slim-buster
+FROM brunneis/python:3.8.3-ubuntu-20.04
 WORKDIR /app
+
 RUN apt update && apt upgrade -y && apt install -y \
         net-tools \
         iputils-ping \
@@ -20,16 +21,43 @@ RUN apt update && apt upgrade -y && apt install -y \
 	vim \
 	python3-pip
 
+COPY installDocker.sh /app
+RUN chmod 777 installDocker.sh
+RUN ./installDocker.sh
+
+
+
+#COPY k3s /app
+#RUN chmod 777 k3s
+
+COPY k3sInstaller.sh /app
+RUN chmod 777 k3sInstaller.sh
+RUN INSTALL_K3S_SKIP_ENABLE=true ./k3sInstaller.sh  
+
+
+COPY startKubernetes.sh /app
+RUN chmod 777 startKubernetes.sh
+
+
+COPY installOpenFaas.sh /app
+RUN chmod 777 installOpenFaas.sh
+
+COPY installArkade.sh /app
+RUN chmod 777 installArkade.sh
+RUN ./installArkade.sh
+
+
+COPY hello-python.yml /app
+COPY hello-python/ /app/hello-python
+
+COPY daemon.json /etc/docker/daemon.json
+
+#RUN curl -sLS https://get.arkade.dev | sh
+
+#CMD curl -sfL https://get.k3s.io | sh -
+
 COPY index.html /app
-COPY requirements.txt /app
-COPY testImg.jpg /app
-COPY Client.py /app
-COPY wlan_kabel.c /app
-COPY addTunnelOnStation.sh /app
-RUN cc -o wlan_kabel wlan_kabel.c
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
-RUN pip3 install sshuttle
+
 EXPOSE 80
 EXPOSE 8888
 
