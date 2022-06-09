@@ -19,6 +19,7 @@ RUN apt update && apt upgrade -y && apt install -y \
 	openvswitch-switch \
 	build-essential \
 	vim \
+	mlocate \
 	python3-pip
 
 COPY installDocker.sh /app
@@ -47,6 +48,17 @@ RUN chmod 777 installArkade.sh
 RUN ./installArkade.sh
 
 
+RUN mkdir -p /app/faas-0.18.18
+ADD faas-0.18.18 /app/faas-0.18.18
+RUN chmod -R 777 installOpenFaas.sh
+COPY faas-cli /app
+RUN chmod 777 faas-cli
+
+COPY start_cluster.sh /app
+RUN chmod 777 start_cluster.sh
+
+
+
 COPY hello-python.yml /app
 COPY hello-python/ /app/hello-python
 
@@ -60,5 +72,7 @@ COPY index.html /app
 
 EXPOSE 80
 EXPOSE 8888
+EXPOSE 8080
+EXPOSE 2377
 
 

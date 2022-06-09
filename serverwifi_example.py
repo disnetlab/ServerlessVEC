@@ -30,7 +30,7 @@ import pdb
 def topology(args):
 
     net = Containernet(controller=RemoteController, link=wmediumd, wmediumd_mode=interference, ac_method='ssf')
-    c1 = net.addController('c1', controller=RemoteController, ip='192.168.168.5', port=6653 )
+    c1 = net.addController('c1', controller=RemoteController, ip='192.168.56.117', port=6653 )
 ##
     info("*** Creating nodes\n")
     ap1 = net.addAccessPoint('ap1', ssid='new-ssid', mode='b',ip='172.18.5.13/24', protocols='OpenFlow13', datapath='kernel',
@@ -48,10 +48,10 @@ def topology(args):
 
 
     
-    sta1 = net.addStation('sta1',  mode='b',mac='00:00:00:00:00:02', ip='172.18.5.11/24', cls=DockerSta, ports=[80,8888], dcmd='python -m http.server --bind 0.0.0.0 80', dimage="server_example:latest", 
+    sta1 = net.addStation('sta1',  mode='b',mac='00:00:00:00:00:02', ip='172.18.5.11/24', cls=DockerSta, ports=[80,8888], dimage="server_example:latest", 
                    position='49,50,0')
     
-    sta2 = net.addStation('sta2', mode='b', mac='00:00:00:00:00:03', ip='172.18.5.10/24', cls=DockerSta, ports=[80,8888], dcmd='python -m http.server --bind 0.0.0.0 80', dimage="server_example:latest", 
+    sta2 = net.addStation('sta2', mode='b', mac='00:00:00:00:00:03', ip='172.18.5.10/24', cls=DockerSta, ports=[80,8888], dimage="server_example:latest", 
                    position='49,50,0')
 ##
 ##    sta3 = net.addStation('sta3', mac='00:00:44:00:01:03', ip='10.10.10.9', 
