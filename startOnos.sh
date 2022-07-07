@@ -9,7 +9,7 @@ SSH_KEY=$(cut -d\  -f2 ~/.ssh/id_rsa.pub)
 ONOS_IMAGE=onosproject/onos:1.15.0
 for i in {1..1}; do
     echo "Setting up onos-$i..."
-    docker container run --detach --name onos-$i --hostname onos-$i --restart=always $ONOS_IMAGE
+    docker container run -p 8181:8181 -p 8101:8101 -p 5005:5005 -p 830:830 -p 9876:9876 -p 6653:6653 -p 6640:6640 --detach --name onos-$i --hostname onos-$i --restart=always $ONOS_IMAGE
 done
 
 function waitForStart {
@@ -21,7 +21,7 @@ function waitForStart {
             curl --fail -sS http://$ip:8181/onos/v1/applications --user onos:rocks 1>/dev/null 2>&1 && break;
             sleep 1;
         done
-        onos $ip summary >/dev/null 2>&1
+        # onos $ip summary >/dev/null 2>&1
     done
 }
 
@@ -33,7 +33,7 @@ OC1=$(docker container inspect onos-1 | grep \"IPAddress | cut -d: -f2 | sort -u
 
 waitForStart
 
-#echo "Activating OpenFlow and ProxyARP applications..." $OC1
+echo "Activating OpenFlow and ProxyARP applications..." $OC1
 #onos $OC1 app activate org.onosproject.openflow proxyarp layout
 #onos $OC1
 

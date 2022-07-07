@@ -27,7 +27,6 @@ RUN chmod 777 installDocker.sh
 RUN ./installDocker.sh
 
 
-
 #COPY k3s /app
 #RUN chmod 777 k3s
 
@@ -58,9 +57,13 @@ COPY start_cluster.sh /app
 RUN chmod 777 start_cluster.sh
 
 
+COPY abc.jpg /app
+COPY my_locustfile.py /app
+RUN pip3 install locust
 
 COPY hello-python.yml /app
 COPY hello-python/ /app/hello-python
+ADD Norman /app/Norman
 
 COPY daemon.json /etc/docker/daemon.json
 
@@ -74,5 +77,6 @@ EXPOSE 80
 EXPOSE 8888
 EXPOSE 8080
 EXPOSE 2377
+EXPOSE 5000
 
 

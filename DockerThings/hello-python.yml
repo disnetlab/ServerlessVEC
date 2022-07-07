@@ -6,5 +6,8 @@ functions:
   hello-python:
     lang: python
     handler: ./hello-python
-    image: hello-python:latest
+    image: normchenjk/yolo-image:latest
+    limits:
+      cpu: "300m"
+      memory: "350Mi"
 

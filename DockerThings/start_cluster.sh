@@ -1,4 +1,4 @@
-interface="$1"
+interface="`hostname`-wlan0"
 ip_addr=$(ip addr show $interface | awk '$1 == "inet" {gsub(/\/.*$/, "", $2); print $2}')
 service docker start
 
