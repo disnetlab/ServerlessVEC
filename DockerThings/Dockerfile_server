@@ -55,6 +55,8 @@ RUN chmod 777 faas-cli
 
 COPY start_cluster.sh /app
 RUN chmod 777 start_cluster.sh
+COPY ConnectToCluster.sh /app
+RUN chmod 777 ConnectToCluster.sh
 
 
 COPY abc.jpg /app
