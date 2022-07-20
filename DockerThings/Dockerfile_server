@@ -57,6 +57,10 @@ COPY start_cluster.sh /app
 RUN chmod 777 start_cluster.sh
 COPY ConnectToCluster.sh /app
 RUN chmod 777 ConnectToCluster.sh
+COPY KeepPinging.sh /app
+RUN chmod 777 KeepPinging.sh
+COPY CurlScript.sh /app
+RUN chmod 777 CurlScript.sh
 
 
 COPY abc.jpg /app

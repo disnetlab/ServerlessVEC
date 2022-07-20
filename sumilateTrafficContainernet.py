@@ -89,8 +89,9 @@ def simulateTrafficHelp( net, timestep, vehiclePositions, carObjectDict, carColo
         print("Move %s to 000" %(vehicleId))
         mininetCar = carObjectDict[ vehicleId ]
         mininetCar.setPosition('0,0,0')
-    
-
+        c="c"+str(vehicleId)
+        car = net.get(c)
+        print(car.cmd("./ConnectToCluster.sh 0,0,0 stop"))
 
     #Remove all previous car objects
 ##    carObjectDict.clear()
@@ -110,6 +111,7 @@ def simulateTrafficHelp( net, timestep, vehiclePositions, carObjectDict, carColo
         print("---------------"+vehicleId+"-------------")
         c="c"+str(vehicleId)
         c1 = net.get(c)
+        print(c1.cmd("./ConnectToCluster.sh "+pos))
 ##        print(c1.cmd("iw dev "+c+"-wlan0 link"))
 ##        print(c1.cmd("ping -c 1 10.4.4.2"))
 ##        print(c1.cmd("curl"))
@@ -159,14 +161,21 @@ def findNearestJunction(posX, posY, junctions):
 ##for vehicleId in [x for x in prevTimestep.keys() if x not in curTimestep.keys()]:
 def addAllCars(net, vehiclePositions, carObjectDict):
     print("Enter Add Cars")
+    kwargs = {'ssid': 'vanet-ssid', 'mode': 'g', 'passwd': '123456789a',
+          'encrypt': 'wpa2', 'failMode': 'standalone', 'datapath': 'kernel'}
     for vehicleDict in vehiclePositions:
         for vehicleId in [x for x in vehicleDict.keys() if x not in carObjectDict.keys()]:
-            car = net.addStation("c"+vehicleId, passwd='123456789a', encrypt='wpa2', position='0,0,0', s_inverval=5, l_interval=10, bgscan_module="simple")
+##            car = net.addStation("c"+vehicleId, mode='b', position='50,50,0',
+##                                 cls=DockerSta, ports=[80,8888], dcmd='./ConnectToCluster.sh', dimage="server_example:latest")
+            randomMac = getRandomMac()
+            ip_addr = getRandomIPAddress()+"/24"
+            car = net.addStation("c"+vehicleId,  mode='n',mac=randomMac, ip=ip_addr, cls=DockerSta, ports=[80,8888], dimage="server_example:latest", 
+               position='0,0,0')
             randomMac = getRandomMac()
             ip_addr = getRandomIPAddress()
 ##            attached_vm = net.addDocker("D_"+vehicleId, mac=randomMac, ip = ip_addr, dimage="client_example:latest")
-            attached_vm = net.addHost("D_"+vehicleId, mac=randomMac, cls=Docker, ip = ip_addr, dimage="server_example:latest")
-            net.addLink(car, attached_vm)
+##            attached_vm = net.addStation("D_"+vehicleId, ssid="vanet-ssid" , mac=randomMac, ip=ip_addr+"/24", cls=DockerSta, ports=[80,8888], dcmd='./ConnectToCluster.sh', dimage="server_example:latest")
+##            net.addLink(car, attached_vm)
 
             randomMac = getRandomMac()
             ip_addr = getRandomIPAddress()
@@ -180,7 +189,9 @@ def addAllCars(net, vehiclePositions, carObjectDict):
 def getRandomIPAddress():
 ##    ip = ".".join(map(str, (random.randint(0, 255) for _ in range(4))))
     global ip_count
-    ip = "10.4.4."+str(ip_count)
+    if ip_count == 12:
+        ip_count = 13
+    ip = "172.18.5."+str(ip_count)
     ip_count = ip_count + 1
     return ip
 
@@ -205,10 +216,10 @@ def simulateTraffic( vehiclePositions, sumoNetFile ):
     carObjectDict = {}
     carColorDict = {}
     nearestJnDict = {}
-    net = Containernet(controller=RemoteController, link=wmediumd, wmediumd_mode=interference, accessPoint=OVSKernelAP)
-    over_controller = net.addController('over_controller', controller=RemoteController, ip='192.168.56.101', port=6653 )
+    net = Containernet(controller=RemoteController, link=wmediumd, wmediumd_mode=interference, ac_method='ssf')
+    c1 = net.addController('c1', controller=RemoteController, ip='192.168.56.117', port=6653 )
     access_points = []
-    kwargs = {'ssid': 'vanet-ssid', 'mode': 'g', 'passwd': '123456789a',
+    kwargs = {'ssid': 'vanet-ssid', 'mode': 'b', 'passwd': '123456789a',
               'encrypt': 'wpa2', 'failMode': 'standalone', 'datapath': 'kernel'}
     junctions = parseJunctions( sumoNetfile )
     portMap= 9000
@@ -220,17 +231,23 @@ def simulateTraffic( vehiclePositions, sumoNetFile ):
 
         randomMac = getRandomMac()
         pos = ','.join([str(x) for x in [metX, metY, 5]])
-        ip_addr = getRandomIPAddress()
+        
 
-        apname = "a"+str(count+1)
-        ap = net.addAccessPoint(apname, mac=randomMac, ip = ip_addr, channel='11', protocols='OpenFlow13',
-                                position=pos,**kwargs)
-        randomMac = getRandomMac()
-        ip_addr = getRandomIPAddress()
+        apname = "ap"+str(count+1)
+##        ap = net.addAccessPoint(apname, mac=randomMac, ip = ip_addr, protocols='OpenFlow13',
+##                                position=pos,**kwargs)
+        ip_addr = getRandomIPAddress()+"/24"
         print("Docker ip = "+ip_addr)
-        attached_vm = net.addDocker("D_"+apname, mac=randomMac, ip = ip_addr, ports=[80], dcmd='python -m http.server --bind 0.0.0.0 80', dimage="server_example:latest")
+        ap = net.addAccessPoint('ap1', ssid='new-ssid', mode='n',ip=ip_addr, protocols='OpenFlow13', datapath='kernel',
+                         failMode="standalone", mac='00:00:00:00:00:01',
+                         position=pos)
+        randomMac = getRandomMac()
+
+        attached_vm = net.addHost("D"+apname, mac=randomMac, ip = "172.18.5.12/24",cls=Docker, ports=[80,8888], dcmd='./start_cluster.sh', dimage="server_example:latest")
         access_points.append((ap,attached_vm))
     addAllCars(net, vehiclePositions, carObjectDict)
+
+
     print("*** Configuring Propagation Model\n")
     net.setPropagationModel(model="logDistance", exp=2.8)
     print("*** Configuring wifi nodes\n")
@@ -241,17 +258,18 @@ def simulateTraffic( vehiclePositions, sumoNetFile ):
         for j in range(i+1, numAPs):
             print(str(i)+"----"+str(j))
             net.addLink(access_points[i][0], access_points[j][0])
+            
     for aps in access_points:
         ap = aps[0]
         vm = aps[1]
         net.addLink(ap,vm)
     info("*** Starting network\n")
-    over_controller.start()
+    c1.start()
     net.build()
     for aps in access_points:
-        ap = aps[0]
-        ap.start([over_controller])
-    net.ping([access_points[0][0], access_points[1][0]])
+        aps[0].start([c1])
+    net.start()
+
 
 
 ##    makeTerm(access_points[0], cmd="bash -c 'ping a2'")
@@ -266,12 +284,12 @@ def simulateTraffic( vehiclePositions, sumoNetFile ):
 ##                  max_x=2000, max_y=2000)
 
 
-##    pdb.set_trace()
+    time.sleep(200)
 
-##    x = threading.Thread(target=moveVehicles, args=(net,
-##                vehiclePositions, carObjectDict, carColorDict,
-##                junctions, nearestJnDict,))
-##    x.start()
+    x = threading.Thread(target=moveVehicles, args=(net,
+                vehiclePositions, carObjectDict, carColorDict,
+                junctions, nearestJnDict,))
+    x.start()
 
 
     info("*** Running CLI\n")
@@ -289,7 +307,7 @@ def moveVehicles(net, vehiclePositions,
                  carObjectDict, carColorDict,
                  junctions, nearestJnDict):
     for timestep in range(len(vehiclePositions)):
-        time.sleep(.1)
+        time.sleep(1)
         simulateTrafficHelp( net, timestep, vehiclePositions,
                                             carObjectDict, carColorDict,  junctions, nearestJnDict )
 
@@ -321,5 +339,25 @@ if __name__ == "__main__":
     print(str(xmax)+"---"+str(ymax))
     
     simulateTraffic( vehiclePositions, sumoNetfile )
+
+##    net = Containernet(controller=RemoteController, link=wmediumd, wmediumd_mode=interference, ac_method='ssf')
+##    c1 = net.addController('c1', controller=RemoteController, ip='192.168.56.117', port=6653 )
+##    ap1 = net.addAccessPoint('ap1', ssid='new-ssid', mode='b',ip='172.18.5.25/24', protocols='OpenFlow13', datapath='kernel',
+##                         failMode="standalone", mac='00:00:00:00:00:01',
+##                         position='50,50,0')
+##    
+##    sta1 = net.addStation('sta1',  mode='b',mac='00:00:00:00:00:02', ip='172.18.5.26/24', cls=DockerSta, ports=[80,8888], dcmd='./ConnectToCluster.sh', dimage="server_example:latest", 
+##               position='49,50,0')
+##    sta2 = net.addStation('sta2', mode='b', mac='00:00:00:00:00:03', ip='172.18.5.10/24', cls=DockerSta, ports=[80,8888], dcmd='./ConnectToCluster.sh', dimage="server_example:latest", 
+##               position='49,50,0')
+##    print("*** Configuring Propagation Model\n")
+##    net.setPropagationModel(model="logDistance", exp=2.8)
+##    print("*** Configuring wifi nodes\n")
+##    net.configureWifiNodes()
+##    c1.start()
+##    net.build()
+##    net.start()
+##    CLI(net)
+##    net.stop()
 
     
