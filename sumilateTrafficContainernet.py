@@ -169,8 +169,8 @@ def addAllCars(net, vehiclePositions, carObjectDict):
 ##                                 cls=DockerSta, ports=[80,8888], dcmd='./ConnectToCluster.sh', dimage="server_example:latest")
             randomMac = getRandomMac()
             ip_addr = getRandomIPAddress()+"/24"
-            car = net.addStation("c"+vehicleId,  mode='n',mac=randomMac, ip=ip_addr, cls=DockerSta, ports=[80,8888], dimage="server_example:latest", 
-               position='0,0,0')
+            car = net.addStation("c"+vehicleId,  mode='n',mac=randomMac, ip=ip_addr, cls=DockerSta, ports=[80,8888], mem_limit="256m", dimage="server_example:latest", 
+               position='0,0,0',  txpower=33)
             randomMac = getRandomMac()
             ip_addr = getRandomIPAddress()
 ##            attached_vm = net.addDocker("D_"+vehicleId, mac=randomMac, ip = ip_addr, dimage="client_example:latest")
@@ -199,12 +199,12 @@ def getRandomIPAddress():
 
 def getRandomMac():
     Maclist = []
-    for i in range(1,7):
+    for i in range(1,4):
         RANDSTR = "".join(random.sample("0123456789abcdef",2))
         Maclist.append(RANDSTR)
         RANDMAC = ":".join(Maclist)
         
-    return RANDMAC
+    return "00:00:00:"+RANDMAC
 
 
 #This function simulates all the traffic
@@ -240,10 +240,10 @@ def simulateTraffic( vehiclePositions, sumoNetFile ):
         print("Docker ip = "+ip_addr)
         ap = net.addAccessPoint('ap1', ssid='new-ssid', mode='n',ip=ip_addr, protocols='OpenFlow13', datapath='kernel',
                          failMode="standalone", mac='00:00:00:00:00:01',
-                         position=pos)
+                         position=pos, txpower=33,channel='5')
         randomMac = getRandomMac()
 
-        attached_vm = net.addHost("D"+apname, mac=randomMac, ip = "172.18.5.12/24",cls=Docker, ports=[80,8888], dcmd='./start_cluster.sh', dimage="server_example:latest")
+        attached_vm = net.addDocker("D"+apname, mac=randomMac, ip = "172.18.5.12/24",cls=Docker, ports=[80,8888], mem_limit="1024m",dcmd='./start_cluster.sh',dimage="server_example:latest")
         access_points.append((ap,attached_vm))
     addAllCars(net, vehiclePositions, carObjectDict)
 
@@ -313,6 +313,7 @@ def moveVehicles(net, vehiclePositions,
 
 
 if __name__ == "__main__":
+    setLogLevel('info')
     sumoTracefile = sys.argv[1]
     print(sumoTracefile)
     sumoNetfile = sys.argv[2]

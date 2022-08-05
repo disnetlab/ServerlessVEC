@@ -63,6 +63,14 @@ COPY CurlScript.sh /app
 RUN chmod 777 CurlScript.sh
 
 
+COPY ConnectToClusterServerful.sh /app
+RUN chmod 777 ConnectToClusterServerful.sh
+COPY KeepPingingServerful.sh /app
+RUN chmod 777 KeepPingingServerful.sh
+COPY CurlScriptServerful.sh /app
+RUN chmod 777 CurlScriptServerful.sh
+
+
 COPY abc.jpg /app
 COPY my_locustfile.py /app
 RUN pip3 install locust

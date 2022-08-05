@@ -3,7 +3,7 @@
 'Setting position of the nodes'
 #, network="multi"
 import sys
-
+import random
 from mininet.log import setLogLevel, info
 
 
@@ -26,6 +26,24 @@ from mininet.log import setLogLevel
 import pdb
 
 
+ip_count=20
+def getRandomIPAddress():
+##    ip = ".".join(map(str, (random.randint(0, 255) for _ in range(4))))
+    global ip_count
+    if ip_count == 12:
+        ip_count = 13
+    ip = "172.18.5."+str(ip_count)
+    ip_count = ip_count + 1
+    return ip
+
+def getRandomMac():
+    Maclist = []
+    for i in range(1,7):
+        RANDSTR = "".join(random.sample("0123456789abcdef",2))
+        Maclist.append(RANDSTR)
+        RANDMAC = ":".join(Maclist)
+        
+    return RANDMAC
 
 def topology(args):
 
@@ -36,7 +54,7 @@ def topology(args):
     ap1 = net.addAccessPoint('ap1', ssid='new-ssid', mode='b',ip='172.18.5.13/24', protocols='OpenFlow13', datapath='kernel',
                              failMode="standalone", mac='00:00:00:00:00:01',
                              position='50,50,0')
-    attached_vm = net.addHost("Dap", mac='00:00:00:00:00:12', ip = '172.18.5.12/24', cls=Docker, ports=[80,8888], dcmd='./start_cluster.sh', dimage="server_example:latest")
+    attached_vm = net.addHost("Dap", mac='00:00:00:00:00:12', ip = '172.18.5.12/24', cls=Docker, ports=[80,8080], dcmd='fwatchdog', dimage="faisalyolo")
 
 
 
@@ -48,17 +66,20 @@ def topology(args):
 
 
     
-    sta1 = net.addStation('sta1',  mode='b',mac='00:00:00:00:00:02', ip='172.18.5.11/24', cls=DockerSta, ports=[80,8888], dcmd='./ConnectToCluster.sh', dimage="server_example:latest", 
+    sta1 = net.addStation('sta1',  mode='b',mac='00:00:00:00:00:02', ip='172.18.5.11/24', cls=DockerSta, ports=[80,8888], dcmd='python -m http.server --bind 0.0.0.0 80', dimage="server_example:latest", 
                    position='49,50,0')
     
-    sta2 = net.addStation('sta2', mode='b', mac='00:00:00:00:00:03', ip='172.18.5.10/24', cls=DockerSta, ports=[80,8888], dcmd='./ConnectToCluster.sh', dimage="server_example:latest", 
+    sta2 = net.addStation('sta2', mode='b', mac='00:00:00:00:00:03', ip='172.18.5.10/24', cls=DockerSta, ports=[80,8888], dcmd='python -m http.server --bind 0.0.0.0 80', dimage="server_example:latest", 
                    position='49,50,0')
-##
-##    sta3 = net.addStation('sta3', mac='00:00:44:00:01:03', ip='10.10.10.9', 
+
+##    stas=[]
+##    for i in range(1,15):
+##        ip=getRandomIPAddress()+"/24"
+##        mac=getRandomMac()
+##        sta = net.addStation('sta'+str(i),  mode='b',mac=mac, ip=ip, cls=DockerSta, ports=[80,8888], dcmd='python -m http.server --bind 0.0.0.0 80', dimage="server_example:latest", 
 ##                   position='49,50,0')
-##
-##    sta4 = net.addStation('sta4', mac='00:00:00:35:00:03', ip='10.10.10.12', 
-##                   position='49,50,0')
+##        stas.append(sta)
+        
 
 
     info("*** Configuring propagation model\n")

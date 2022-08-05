@@ -5,9 +5,9 @@ dockerStatus=$(service docker status| awk '{print $4}')
 if [[ "$dockerStatus" == "not" ]];
 then
         service docker start
+	sleep 1
 fi
 
-sleep 1
 interface="`hostname`-wlan0"
 
 #Add Position in PositionFile
