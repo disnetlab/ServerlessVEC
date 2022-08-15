@@ -91,7 +91,7 @@ def simulateTrafficHelp( net, timestep, vehiclePositions, carObjectDict, carColo
         mininetCar.setPosition('0,0,0')
         c="c"+str(vehicleId)
         car = net.get(c)
-        print(car.cmd("./ConnectToCluster.sh 0,0,0 stop"))
+        print(car.cmd("./ConnectToCluster.sh 0,0,0 stop"+" &"))
 
     #Remove all previous car objects
 ##    carObjectDict.clear()
@@ -111,7 +111,7 @@ def simulateTrafficHelp( net, timestep, vehiclePositions, carObjectDict, carColo
         print("---------------"+vehicleId+"-------------")
         c="c"+str(vehicleId)
         c1 = net.get(c)
-        print(c1.cmd("./ConnectToCluster.sh "+pos))
+        print(c1.cmd("./ConnectToCluster.sh "+pos+" &"))
 ##        print(c1.cmd("iw dev "+c+"-wlan0 link"))
 ##        print(c1.cmd("ping -c 1 10.4.4.2"))
 ##        print(c1.cmd("curl"))
@@ -169,7 +169,7 @@ def addAllCars(net, vehiclePositions, carObjectDict):
 ##                                 cls=DockerSta, ports=[80,8888], dcmd='./ConnectToCluster.sh', dimage="server_example:latest")
             randomMac = getRandomMac()
             ip_addr = getRandomIPAddress()+"/24"
-            car = net.addStation("c"+vehicleId,  mode='n',mac=randomMac, ip=ip_addr, cls=DockerSta, ports=[80,8888], mem_limit="256m", dimage="server_example:latest", 
+            car = net.addStation("c"+vehicleId,  mode='n',mac=randomMac, ip=ip_addr, cls=DockerSta, ports=[80,8888], mem_limit="1024m", dimage="server_example:latest", 
                position='0,0,0',  txpower=33)
             randomMac = getRandomMac()
             ip_addr = getRandomIPAddress()
@@ -243,7 +243,7 @@ def simulateTraffic( vehiclePositions, sumoNetFile ):
                          position=pos, txpower=33,channel='5')
         randomMac = getRandomMac()
 
-        attached_vm = net.addDocker("D"+apname, mac=randomMac, ip = "172.18.5.12/24",cls=Docker, ports=[80,8888], mem_limit="1024m",dcmd='./start_cluster.sh',dimage="server_example:latest")
+        attached_vm = net.addDocker("D"+apname, mac=randomMac, ip = "172.18.5.12/24",cls=Docker, ports=[80,8888], mem_limit="2048m",dcmd='./start_cluster.sh',dimage="server_example:latest")
         access_points.append((ap,attached_vm))
     addAllCars(net, vehiclePositions, carObjectDict)
 

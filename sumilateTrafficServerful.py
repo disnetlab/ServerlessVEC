@@ -91,7 +91,7 @@ def simulateTrafficHelp( net, timestep, vehiclePositions, carObjectDict, carColo
         mininetCar.setPosition('0,0,0')
         c="c"+str(vehicleId)
         car = net.get(c)
-        print(car.cmd("./ConnectToClusterServerful.sh 0,0,0 stop"))
+        print(car.cmd("./ConnectToClusterServerful.sh 0,0,0 stop"+" &"))
 
     #Remove all previous car objects
 ##    carObjectDict.clear()
@@ -111,7 +111,7 @@ def simulateTrafficHelp( net, timestep, vehiclePositions, carObjectDict, carColo
         print("---------------"+vehicleId+"-------------")
         c="c"+str(vehicleId)
         c1 = net.get(c)
-        print(c1.cmd("./ConnectToClusterServerful.sh "+pos))
+        print(c1.cmd("./ConnectToClusterServerful.sh "+pos+" &"))
 ##        print(c1.cmd("iw dev "+c+"-wlan0 link"))
 ##        print(c1.cmd("ping -c 1 10.4.4.2"))
 ##        print(c1.cmd("curl"))
@@ -243,7 +243,7 @@ def simulateTraffic( vehiclePositions, sumoNetFile ):
                          position=pos, txpower=33,channel='5')
         randomMac = getRandomMac()
 
-        attached_vm = net.addDocker("D"+apname, mac=randomMac, ip = "172.18.5.12/24",cls=Docker, ports=[80,8888],mem_limit="1024m", dcmd='fwatchdog', dimage="faisalyolo")
+        attached_vm = net.addDocker("D"+apname, mac=randomMac, ip = "172.18.5.12/24",cls=Docker, ports=[80,8888],mem_limit="2048m", dcmd='fwatchdog', dimage="faisalyolo")
         access_points.append((ap,attached_vm))
     addAllCars(net, vehiclePositions, carObjectDict)
 
@@ -284,7 +284,7 @@ def simulateTraffic( vehiclePositions, sumoNetFile ):
 ##                  max_x=2000, max_y=2000)
 
 
-    time.sleep(5)
+    time.sleep(20)
 
     x = threading.Thread(target=moveVehicles, args=(net,
                 vehiclePositions, carObjectDict, carColorDict,

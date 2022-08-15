@@ -54,7 +54,7 @@ def topology(args):
     ap1 = net.addAccessPoint('ap1', ssid='new-ssid', mode='b',ip='172.18.5.13/24', protocols='OpenFlow13', datapath='kernel',
                              failMode="standalone", mac='00:00:00:00:00:01',
                              position='50,50,0')
-    attached_vm = net.addHost("Dap", mac='00:00:00:00:00:12', ip = '172.18.5.12/24', cls=Docker, ports=[80,8080], dcmd='fwatchdog', dimage="faisalyolo")
+    attached_vm = net.addHost("Dap", mac='00:00:00:00:00:12', ip = '172.18.5.12/24', cls=Docker, ports=[80,8080], dcmd='./start_cluster.sh',dimage="server_example:latest")
 
 
 
@@ -68,9 +68,16 @@ def topology(args):
     
     sta1 = net.addStation('sta1',  mode='b',mac='00:00:00:00:00:02', ip='172.18.5.11/24', cls=DockerSta, ports=[80,8888], dcmd='python -m http.server --bind 0.0.0.0 80', dimage="server_example:latest", 
                    position='49,50,0')
+    pos='49,50,0'
+    d1 = net.get('sta1')
+    print(d1.cmd("./ConnectToCluster.sh "+pos))
     
     sta2 = net.addStation('sta2', mode='b', mac='00:00:00:00:00:03', ip='172.18.5.10/24', cls=DockerSta, ports=[80,8888], dcmd='python -m http.server --bind 0.0.0.0 80', dimage="server_example:latest", 
                    position='49,50,0')
+    pos='49,50,0'
+    d1 = net.get('sta2')
+    print(d1.cmd("./ConnectToCluster.sh "+pos))
+
 
 ##    stas=[]
 ##    for i in range(1,15):

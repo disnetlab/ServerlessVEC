@@ -6,6 +6,6 @@ do
         count=$((count+1))
         echo ${count}
         sleep 2
-        ./CurlScript.sh ${count} >> PingLogs & 
+        ./CurlScript.sh ${count} >> PingLogs  
 done 
 

@@ -10,4 +10,3 @@ functions:
     limits:
       cpu: "300m"
       memory: "350Mi"
-

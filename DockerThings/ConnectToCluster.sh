@@ -34,6 +34,7 @@ then
                 keepPingingScript=$(ps aux | grep KeepPinging.sh | grep -v grep| awk '{print $NF}')
                 if [[ "$keepPingingScript" == "" ]];
                 then
+			date>test
                         ./KeepPinging.sh &
                 fi
         fi
@@ -43,5 +44,6 @@ if [[ "$2" == "stop" ]];
 then
         pid=$(ps aux| grep KeepPinging| grep -v grep| awk '{print $2}')
         kill -9 "$pid"
+	date>>test
 fi
 

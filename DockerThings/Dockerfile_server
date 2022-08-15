@@ -52,6 +52,10 @@ ADD faas-0.18.18 /app/faas-0.18.18
 RUN chmod -R 777 installOpenFaas.sh
 COPY faas-cli /app
 RUN chmod 777 faas-cli
+ADD template /app/template
+COPY allImages.tar /app/
+#ADD OpenFaasImages /app/OpenFaasImages
+
 
 COPY start_cluster.sh /app
 RUN chmod 777 start_cluster.sh
@@ -61,6 +65,8 @@ COPY KeepPinging.sh /app
 RUN chmod 777 KeepPinging.sh
 COPY CurlScript.sh /app
 RUN chmod 777 CurlScript.sh
+COPY coldStart.sh /app
+RUN chmod 777 coldStart.sh
 
 
 COPY ConnectToClusterServerful.sh /app
@@ -69,6 +75,8 @@ COPY KeepPingingServerful.sh /app
 RUN chmod 777 KeepPingingServerful.sh
 COPY CurlScriptServerful.sh /app
 RUN chmod 777 CurlScriptServerful.sh
+COPY start_serverful.sh /app
+RUN chmod 777 start_serverful.sh
 
 
 COPY abc.jpg /app

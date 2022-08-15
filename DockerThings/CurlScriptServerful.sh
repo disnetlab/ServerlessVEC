@@ -4,6 +4,13 @@ TIMEFORMAT=%R
 serNo="$1"
 
 response="$(time (curl -s --form "image_file=@abc.jpg"  http://172.18.5.12:8080/function/hello-python) 2>timetemp)"
+if [ -z "$response" ]
+then
+        response="Unsucc"
+else
+        response="Succesful"
+fi
+
 #echo "$mytime"
 mytime=$(head -n 1 timetemp)
 #echo "$mytime"

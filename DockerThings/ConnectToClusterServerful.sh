@@ -11,6 +11,7 @@ then
 	if [[ "$keepPingingScript" == "" ]];
 	then
 		./KeepPingingServerful.sh &
+		date>test
 	fi
 fi
 
@@ -18,5 +19,6 @@ if [[ "$2" == "stop" ]];
 then
         pid=$(ps aux| grep KeepPingingServerful| grep -v grep| awk '{print $2}')
         kill -9 "$pid"
+	date>>test
 fi
 
