@@ -56,6 +56,7 @@ curl -s --form "image_file=@abc.jpg"  http://172.18.5.12:8080/function/hello-pyt
 echo "------------------------"
 sleep 3
 
+python spreadCluster.py &
 
 echo "Hello"
 docker swarm join-token worker| grep join > index.html

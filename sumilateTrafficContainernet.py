@@ -72,7 +72,8 @@ def getCarColor( carId, carColorDict):
         return carColorDict[carId]
 
 
-def simulateTrafficHelp( net, timestep, vehiclePositions, carObjectDict, carColorDict,  junctions, nearestJnDict):
+def simulateTrafficHelp( net, timestep, vehiclePositions, carObjectDict,
+                         carColorDict,  junctions, nearestJnDict, canvas, screenObjectsDict):
     global xmax
     global ymax
     global screenDim
@@ -89,12 +90,12 @@ def simulateTrafficHelp( net, timestep, vehiclePositions, carObjectDict, carColo
         print("Move %s to 000" %(vehicleId))
         mininetCar = carObjectDict[ vehicleId ]
         mininetCar.setPosition('0,0,0')
+        canvas.delete(screenObjectsDict[ vehicleId ][0])
         c="c"+str(vehicleId)
         car = net.get(c)
         print(car.cmd("./ConnectToCluster.sh 0,0,0 stop"+" &"))
 
     #Remove all previous car objects
-##    carObjectDict.clear()
     kwargs = {'ssid': 'vanet-ssid', 'mode': 'g', 'passwd': '123456789a',
               'encrypt': 'wpa2', 'failMode': 'standalone', 'datapath': 'user'}
 
@@ -102,6 +103,7 @@ def simulateTrafficHelp( net, timestep, vehiclePositions, carObjectDict, carColo
         posX = float(curTimestep[vehicleId][0])
         posY = float(curTimestep[vehicleId][1])
         (metX, metY) = translateInMeters (posX, posY)
+        (scrX, scrY) = translateToScreen (posX, posY)
         pos = ','.join([str(x) for x in [metX, metY, 0]])
         print("Move==="+vehicleId+"=="+pos)
 
@@ -112,6 +114,14 @@ def simulateTrafficHelp( net, timestep, vehiclePositions, carObjectDict, carColo
         c="c"+str(vehicleId)
         c1 = net.get(c)
         print(c1.cmd("./ConnectToCluster.sh "+pos+" &"))
+
+        if(screenObjectsDict[ vehicleId ][0] != None):
+            canvas.delete(screenObjectsDict[ vehicleId ][0])
+        col = screenObjectsDict[ vehicleId ][1]
+        cir = create_circle(scrX, scrY, 5, col, canvas)
+        screenObjectsDict[ vehicleId ] = (cir,col)
+        
+        
 ##        print(c1.cmd("iw dev "+c+"-wlan0 link"))
 ##        print(c1.cmd("ping -c 1 10.4.4.2"))
 ##        print(c1.cmd("curl"))
@@ -159,7 +169,7 @@ def findNearestJunction(posX, posY, junctions):
 
 
 ##for vehicleId in [x for x in prevTimestep.keys() if x not in curTimestep.keys()]:
-def addAllCars(net, vehiclePositions, carObjectDict):
+def addAllCars(net, vehiclePositions, carObjectDict, screenObjectsDict):
     print("Enter Add Cars")
     kwargs = {'ssid': 'vanet-ssid', 'mode': 'g', 'passwd': '123456789a',
           'encrypt': 'wpa2', 'failMode': 'standalone', 'datapath': 'kernel'}
@@ -169,7 +179,7 @@ def addAllCars(net, vehiclePositions, carObjectDict):
 ##                                 cls=DockerSta, ports=[80,8888], dcmd='./ConnectToCluster.sh', dimage="server_example:latest")
             randomMac = getRandomMac()
             ip_addr = getRandomIPAddress()+"/24"
-            car = net.addStation("c"+vehicleId,  mode='n',mac=randomMac, ip=ip_addr, cls=DockerSta, ports=[80,8888], mem_limit="1024m", dimage="server_example:latest", 
+            car = net.addStation("c"+vehicleId,  mode='n',mac=randomMac, ip=ip_addr, cls=DockerSta, ports=[80,8888], dimage="server_example:latest", 
                position='0,0,0',  txpower=33)
             randomMac = getRandomMac()
             ip_addr = getRandomIPAddress()
@@ -182,6 +192,14 @@ def addAllCars(net, vehiclePositions, carObjectDict):
 ##            car = net.addStation(vehicleId, ip=ip_addr, mac=randomMac,
 ##                          cls=DockerSta, dimage="ubuntu:trusty", cpu_shares=20)
             carObjectDict[vehicleId] = car
+
+            #ScreenParameters added
+            col = getRandColor()
+            #cir = create_circle(0, 0, 5, col, canvas)
+            screenObjectsDict[ vehicleId ] = (None, col)
+
+
+            
     print("Exit")
             
 
@@ -216,6 +234,20 @@ def simulateTraffic( vehiclePositions, sumoNetFile ):
     carObjectDict = {}
     carColorDict = {}
     nearestJnDict = {}
+    screenObjectsDict = {}
+
+
+    win= Tk()
+    screen_width = float(win.winfo_screenwidth())
+    screen_height = float(win.winfo_screenheight())
+    screenDim = ( screen_width, screen_height)
+    canvas= Canvas(win,width=screen_width, height=screen_height)
+    canvas.pack(fill="both", expand=True)
+
+
+
+
+    
     net = Containernet(controller=RemoteController, link=wmediumd, wmediumd_mode=interference, ac_method='ssf')
     c1 = net.addController('c1', controller=RemoteController, ip='192.168.56.117', port=6653 )
     access_points = []
@@ -228,6 +260,11 @@ def simulateTraffic( vehiclePositions, sumoNetFile ):
         (posX,posY) = junctions[ junctionId ]
         
         (metX,metY) = translateInMeters(posX, posY)
+
+        (scrX,scrY) = translateToScreen(posX, posY)
+
+        canvas.create_rectangle(scrX, scrY, scrX+5, scrY+5,
+                                outline="#000", fill="#000")
 
         randomMac = getRandomMac()
         pos = ','.join([str(x) for x in [metX, metY, 5]])
@@ -243,9 +280,9 @@ def simulateTraffic( vehiclePositions, sumoNetFile ):
                          position=pos, txpower=33,channel='5')
         randomMac = getRandomMac()
 
-        attached_vm = net.addDocker("D"+apname, mac=randomMac, ip = "172.18.5.12/24",cls=Docker, ports=[80,8888], mem_limit="2048m",dcmd='./start_cluster.sh',dimage="server_example:latest")
+        attached_vm = net.addHost("D"+apname, mac=randomMac, ip = "172.18.5.12/24",cls=Docker, ports=[80,8888], dcmd='./start_cluster.sh', dimage="server_example:latest")
         access_points.append((ap,attached_vm))
-    addAllCars(net, vehiclePositions, carObjectDict)
+    addAllCars(net, vehiclePositions, carObjectDict, screenObjectsDict)
 
 
     print("*** Configuring Propagation Model\n")
@@ -286,10 +323,14 @@ def simulateTraffic( vehiclePositions, sumoNetFile ):
 
     time.sleep(200)
 
-    x = threading.Thread(target=moveVehicles, args=(net,
+##    x = threading.Thread(target=moveVehicles, args=(net,
+##                vehiclePositions, carObjectDict, carColorDict,
+##                junctions, nearestJnDict,screenObjectsDict, canvas))
+##    x.start()
+
+    moveVehicles(net,
                 vehiclePositions, carObjectDict, carColorDict,
-                junctions, nearestJnDict,))
-    x.start()
+                junctions, nearestJnDict,screenObjectsDict, canvas, win)
 
 
     info("*** Running CLI\n")
@@ -305,11 +346,16 @@ def simulateTraffic( vehiclePositions, sumoNetFile ):
     
 def moveVehicles(net, vehiclePositions,
                  carObjectDict, carColorDict,
-                 junctions, nearestJnDict):
+                 junctions, nearestJnDict, screenObjectsDict, canvas, win):
+    count=0
     for timestep in range(len(vehiclePositions)):
         time.sleep(1)
-        simulateTrafficHelp( net, timestep, vehiclePositions,
-                                            carObjectDict, carColorDict,  junctions, nearestJnDict )
+        simulateTrafficHelp( net, timestep, vehiclePositions, carObjectDict,
+                             carColorDict,  junctions, nearestJnDict, canvas, screenObjectsDict )
+
+
+        win.update_idletasks()
+        win.update()
 
 
 if __name__ == "__main__":

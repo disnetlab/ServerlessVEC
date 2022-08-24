@@ -20,7 +20,13 @@ RUN apt update && apt upgrade -y && apt install -y \
 	build-essential \
 	vim \
 	mlocate \
-	python3-pip
+	python3-pip \
+	software-properties-common
+
+
+#COPY installNomad.sh /app
+#RUN chmod 777 installNomad.sh
+#RUN ./installNomad.sh
 
 COPY installDocker.sh /app
 RUN chmod 777 installDocker.sh
@@ -30,26 +36,25 @@ RUN ./installDocker.sh
 #COPY k3s /app
 #RUN chmod 777 k3s
 
-COPY k3sInstaller.sh /app
-RUN chmod 777 k3sInstaller.sh
-RUN INSTALL_K3S_SKIP_ENABLE=true ./k3sInstaller.sh  
+#COPY k3sInstaller.sh /app
+#RUN chmod 777 k3sInstaller.sh
+#RUN INSTALL_K3S_SKIP_ENABLE=true ./k3sInstaller.sh  
 
 
-COPY startKubernetes.sh /app
-RUN chmod 777 startKubernetes.sh
+#COPY startKubernetes.sh /app
+#RUN chmod 777 startKubernetes.sh
 
 
-COPY installOpenFaas.sh /app
-RUN chmod 777 installOpenFaas.sh
+#COPY installOpenFaas.sh /app
+#RUN chmod 777 installOpenFaas.sh
 
-COPY installArkade.sh /app
-RUN chmod 777 installArkade.sh
-RUN ./installArkade.sh
+#COPY installArkade.sh /app
+#RUN chmod 777 installArkade.sh
+#RUN ./installArkade.sh
 
 
 RUN mkdir -p /app/faas-0.18.18
 ADD faas-0.18.18 /app/faas-0.18.18
-RUN chmod -R 777 installOpenFaas.sh
 COPY faas-cli /app
 RUN chmod 777 faas-cli
 ADD template /app/template
@@ -65,9 +70,10 @@ COPY KeepPinging.sh /app
 RUN chmod 777 KeepPinging.sh
 COPY CurlScript.sh /app
 RUN chmod 777 CurlScript.sh
-COPY coldStart.sh /app
-RUN chmod 777 coldStart.sh
-
+COPY startupCar.sh /app
+RUN chmod 777 startupCar.sh
+COPY spreadCluster.py /app
+RUN chmod 777 spreadCluster.py
 
 COPY ConnectToClusterServerful.sh /app
 RUN chmod 777 ConnectToClusterServerful.sh
@@ -75,8 +81,8 @@ COPY KeepPingingServerful.sh /app
 RUN chmod 777 KeepPingingServerful.sh
 COPY CurlScriptServerful.sh /app
 RUN chmod 777 CurlScriptServerful.sh
-COPY start_serverful.sh /app
-RUN chmod 777 start_serverful.sh
+#COPY start_serverful.sh /app
+#RUN chmod 777 start_serverful.sh
 
 
 COPY abc.jpg /app
