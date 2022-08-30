@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- generated on 2022-08-09 03:06:31.825680 by randomTrips.py UNKNOWN
+<!-- generated on 2022-08-25 23:35:30.218931 by randomTrips.py UNKNOWN
 <configuration>
-    <end value="5"/>
+    <end value="300"/>
     <net-file value="melbcbd.net.xml"/>
-    <period value="0.5"/>
+    <period value="20.0"/>
     <route-file value="routes.rou.xml"/>
     <output-trip-file value="trips.xml"/>
 </configuration>
@@ -11,13 +11,18 @@
 -->
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
     <trip id="0" depart="0.00" from="337541591#0" to="-337541591#1"/>
-    <trip id="1" depart="0.50" from="-4759022#2" to="-337541591#1"/>
-    <trip id="2" depart="1.00" from="337541591#0" to="117060728#1"/>
-    <trip id="3" depart="1.50" from="792170395#0" to="-337541591#1"/>
-    <trip id="4" depart="2.00" from="-4759022#2" to="-337541591#1"/>
-    <trip id="5" depart="2.50" from="-117060728#2" to="117060728#1"/>
-    <trip id="6" depart="3.00" from="-117060728#2" to="-337541591#1"/>
-    <trip id="7" depart="3.50" from="337541591#0" to="117060728#1"/>
-    <trip id="8" depart="4.00" from="-117060728#2" to="117060728#1"/>
-    <trip id="9" depart="4.50" from="792170395#0" to="-337541591#1"/>
+    <trip id="1" depart="20.00" from="-4759022#2" to="-337541591#1"/>
+    <trip id="2" depart="40.00" from="337541591#0" to="117060728#1"/>
+    <trip id="3" depart="60.00" from="792170395#0" to="-337541591#1"/>
+    <trip id="4" depart="80.00" from="-4759022#2" to="-337541591#1"/>
+    <trip id="5" depart="100.00" from="-117060728#2" to="117060728#1"/>
+    <trip id="6" depart="120.00" from="-117060728#2" to="-337541591#1"/>
+    <trip id="7" depart="140.00" from="337541591#0" to="117060728#1"/>
+    <trip id="8" depart="160.00" from="-117060728#2" to="117060728#1"/>
+    <trip id="9" depart="180.00" from="792170395#0" to="-337541591#1"/>
+    <trip id="10" depart="200.00" from="792170395#0" to="117060728#1"/>
+    <trip id="11" depart="220.00" from="-4759022#2" to="-337541591#1"/>
+    <trip id="12" depart="240.00" from="792170395#0" to="-792170395#1"/>
+    <trip id="13" depart="260.00" from="-117060728#2" to="-337541591#1"/>
+    <trip id="14" depart="280.00" from="792170395#0" to="117060728#1"/>
 </routes>

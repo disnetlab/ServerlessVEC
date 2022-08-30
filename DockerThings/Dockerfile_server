@@ -74,6 +74,8 @@ COPY startupCar.sh /app
 RUN chmod 777 startupCar.sh
 COPY spreadCluster.py /app
 RUN chmod 777 spreadCluster.py
+COPY installYoloImage.sh /app
+RUN chmod 777 installYoloImage.sh
 
 COPY ConnectToClusterServerful.sh /app
 RUN chmod 777 ConnectToClusterServerful.sh

@@ -243,7 +243,7 @@ def simulateTraffic( vehiclePositions, sumoNetFile ):
                          position=pos, txpower=33,channel='5')
         randomMac = getRandomMac()
 
-        attached_vm = net.addHost("D"+apname, mac=randomMac, ip = "172.18.5.12/24",cls=Docker, ports=[80,8888], mem_limit="2048m",dcmd='./start_cluster.sh', dimage="server_example:latest")
+        attached_vm = net.addHost("D"+apname, mac=randomMac, ip = "172.18.5.12/24",cls=Docker, ports=[80,8888], mem_limit="2048m", dimage="server_example:latest")
         access_points.append((ap,attached_vm))
     addAllCars(net, vehiclePositions, carObjectDict)
 
@@ -279,6 +279,11 @@ def simulateTraffic( vehiclePositions, sumoNetFile ):
     nodes = net.stations + net.aps
     print(distInMetersBox)
     dist = str(distInMetersBox)
+    for aps in access_points:
+        print("Hello"+str(aps[1]))
+        thisAP = net.get(str(aps[1]))
+        print(thisAP.cmd("./start_cluster.sh &"))
+        print("Left")
 ##    net.telemetry(nodes=nodes, data_type='position',
 ##                  min_x=0, min_y=0,
 ##                  max_x=2000, max_y=2000)

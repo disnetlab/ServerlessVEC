@@ -5,6 +5,6 @@ while true
 do
         count=$((count+1))
         echo ${count}
-        sleep 2
-        ./CurlScriptServerful.sh ${count} >> PingLogs 
+        sleep 0.5
+        ./CurlScriptServerful.sh ${count} >> PingLogs & 
 done
