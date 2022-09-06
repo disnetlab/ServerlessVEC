@@ -73,7 +73,8 @@ WORKDIR /home/app/
 #configure WSGI server and healthcheck
 #USER root
 
-ENV fprocess="python index.py"
+#ENV fprocess="python index.py"
+ENV fprocess="python -m http.server --bind 0.0.0.0 80"
 
 ENV cgi_headers="true"
 ENV mode="http"

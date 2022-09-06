@@ -11,7 +11,8 @@ functions:
       cpu: "300m"
       memory: "350Mi"
     labels:
-      com.openfaas.scale.min: "3"
+      com.openfaas.scale.min: "1"
+      com.openfaas.scale.max: "5"
       com.openfaas.scale.type: "rps"
       com.openfaas.scale.target: "3"
       com.openfaas.scale.target-proportion: "0.8"

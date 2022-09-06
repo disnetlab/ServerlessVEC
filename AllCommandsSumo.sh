@@ -2,6 +2,6 @@ netconvert --type-files osmNetconvert.typ.xml,osmNetconvertUrbanDe.typ.xml,osmNe
 
 polyconvert --net-file melbcbd.net.xml --osm-files map.osm -o melbcbd.poly.xml
 
-/usr/share/sumo/tools/randomTrips.py -n melbcbd.net.xml -r routes.rou.xml -o trips.xml -e 300  --period 20
+/usr/share/sumo/tools/randomTrips.py -n melbcbd.net.xml -r routes.rou.xml -o trips.xml -e 300  --period 10
 
-sumo -c simple.sumocfg  --fcd-output sumoTrace.xml
+sumo-gui -c simple.sumocfg  --fcd-output sumoTrace.xml

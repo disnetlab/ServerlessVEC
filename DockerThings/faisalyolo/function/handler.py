@@ -119,7 +119,8 @@ def handle(request):
         "X-Image-Fetch-Time": str(image_elapsed),
         "X-Processing-Time": str(total_elapsed - image_elapsed),
         "X-Worker-Name": socket.gethostname(),
-        "X-Worker-Ip": socket.gethostbyname(socket.gethostname())
+        "X-Worker-Ip": socket.gethostbyname(socket.gethostname()),
+        "Connection": "close"
     } 
 
     if request.headers.get('Header-Output'):
