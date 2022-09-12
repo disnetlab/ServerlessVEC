@@ -387,24 +387,6 @@ if __name__ == "__main__":
     
     simulateTraffic( vehiclePositions, sumoNetfile )
 
-##    net = Containernet(controller=RemoteController, link=wmediumd, wmediumd_mode=interference, ac_method='ssf')
-##    c1 = net.addController('c1', controller=RemoteController, ip='192.168.56.117', port=6653 )
-##    ap1 = net.addAccessPoint('ap1', ssid='new-ssid', mode='b',ip='172.18.5.25/24', protocols='OpenFlow13', datapath='kernel',
-##                         failMode="standalone", mac='00:00:00:00:00:01',
-##                         position='50,50,0')
-##    
-##    sta1 = net.addStation('sta1',  mode='b',mac='00:00:00:00:00:02', ip='172.18.5.26/24', cls=DockerSta, ports=[80,8888], dcmd='./ConnectToCluster.sh', dimage="server_example:latest", 
-##               position='49,50,0')
-##    sta2 = net.addStation('sta2', mode='b', mac='00:00:00:00:00:03', ip='172.18.5.10/24', cls=DockerSta, ports=[80,8888], dcmd='./ConnectToCluster.sh', dimage="server_example:latest", 
-##               position='49,50,0')
-##    print("*** Configuring Propagation Model\n")
-##    net.setPropagationModel(model="logDistance", exp=2.8)
-##    print("*** Configuring wifi nodes\n")
-##    net.configureWifiNodes()
-##    c1.start()
-##    net.build()
-##    net.start()
-##    CLI(net)
-##    net.stop()
+
 
     

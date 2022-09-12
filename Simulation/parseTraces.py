@@ -2,15 +2,14 @@ import sys
 import xml.etree.ElementTree as ET
 from geopy import distance
 
-
-
-
 def getMapDimensions(sumoNetfile):
     root = ET.parse(sumoNetfile).getroot()
     for location in root.findall('location'):
         attributes = location.attrib
         sumoBBox = tuple(attributes.get('convBoundary').split(','))
         osmBBox = tuple(attributes.get('origBoundary').split(','))
+        sumoBBox = tuple(float(item) for item in sumoBBox)
+        osmBBox = tuple(float(item) for item in osmBBox)
         return (sumoBBox, osmBBox)
     
 
@@ -44,19 +43,16 @@ def parseJunctions( sumoNetfile ):
         if type in ['traffic_light','traffic_light_unregulated']:
             junctions[id]=(posX,posY)
     return junctions
-
+        
 def getAllVehicles(sumoTracefile):
-    vehicleSet={} #Set as Set that has no duplicates
+    vehicleSet=set() #Set as Set that has no duplicates
     root = ET.parse(sumoTracefile).getroot()
     for timestep in root.findall('timestep'):
-        vehiclesTimeT = {}
         for vehicle in timestep.findall('vehicle'):
             attributes = vehicle.attrib
             id = attributes.get('id')
-            print(id)
-        vehicleSet.add( id )
-    return vehicleSet        
-    
+            vehicleSet.add(id)
+    return vehicleSet     
 
 if __name__ == "__main__":
     sumoTracefile = sys.argv[1]
