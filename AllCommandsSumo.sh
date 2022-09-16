@@ -2,7 +2,7 @@ netconvert --type-files osmNetconvert.typ.xml,osmNetconvertUrbanDe.typ.xml,osmNe
 
 polyconvert --net-file melbcbd.net.xml --osm-files map.osm -o melbcbd.poly.xml
 
-/usr/share/sumo/tools/randomTrips.py -n melbcbd.net.xml -r routes.rou.xml -o trips.xml -e 300  --insertion-rate "$1" 
+/usr/share/sumo/tools/randomTrips.py -n melbcbd.net.xml -r routes.rou.xml -o trips.xml -e 120  --insertion-rate "$1" 
 
 sumo -c simple.sumocfg  --fcd-output sumoTrace.xml
 

@@ -4,7 +4,7 @@ interface="`hostname`-eth0"
 ip_addr=$(ip addr show $interface | awk '$1 == "inet" {gsub(/\/.*$/, "", $2); print $2}')
 service docker start
 echo "$ip_addr"
-sleep 1
+sleep 2
 
 for image in "/app/OpenFaasImages"/*
 do
@@ -60,4 +60,3 @@ sleep 3
 
 echo "Hello"
 docker swarm join-token worker| grep join > index.html
-python -m http.server 5000 

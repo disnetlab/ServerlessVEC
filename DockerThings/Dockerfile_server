@@ -59,6 +59,7 @@ COPY faas-cli /app
 RUN chmod 777 faas-cli
 #ADD template /app/template
 COPY allImages.tar /app/
+COPY normanchenImg.tar /app/
 #ADD OpenFaasImages /app/OpenFaasImages
 
 
@@ -83,13 +84,15 @@ COPY KeepPingingServerful.sh /app
 RUN chmod 777 KeepPingingServerful.sh
 COPY CurlScriptServerful.sh /app
 RUN chmod 777 CurlScriptServerful.sh
+COPY start_vehicle.sh /app
+RUN chmod 777 start_vehicle.sh
 #COPY start_serverful.sh /app
 #RUN chmod 777 start_serverful.sh
 
 
 COPY abc.jpg /app
-COPY my_locustfile.py /app
-RUN pip3 install locust
+#COPY my_locustfile.py /app
+#RUN pip3 install locust
 
 COPY hello-python.yml /app
 COPY hello-python/ /app/hello-python
