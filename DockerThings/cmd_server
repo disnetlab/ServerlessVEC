@@ -1,1 +1,1 @@
-sudo docker build -t server_example -f Dockerfile_server .
+sudo docker build -t server_example --force-rm=true -f Dockerfile_server .

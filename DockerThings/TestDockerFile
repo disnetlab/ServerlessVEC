@@ -1,0 +1,24 @@
+FROM brunneis/python:3.8.3-ubuntu-20.04
+
+RUN apt update && apt upgrade -y && apt install -y \
+        net-tools \
+        iputils-ping \
+        iproute2 \
+        telnet telnetd \
+        iperf \
+        curl \
+        tcpdump \
+        iw \
+        iproute2 \
+        net-tools \
+        ethtool \
+        wireless-tools \
+#        openssh-server \
+#        iptables \
+#       openvswitch-switch \
+#        build-essential \
+#        vim \
+        mlocate \
+        python3-pip \
+        software-properties-common
+

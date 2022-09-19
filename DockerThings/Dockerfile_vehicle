@@ -1,0 +1,112 @@
+FROM brunneis/python:3.8.3-ubuntu-20.04
+WORKDIR /app
+
+RUN apt update && apt upgrade -y && apt install -y \
+        net-tools \
+        iputils-ping \
+        iproute2 \
+        telnet telnetd \
+        iperf \
+	curl \
+	tcpdump \
+	iw \
+	iproute2 \
+	net-tools \
+	ethtool \
+	wireless-tools \
+	build-essential \
+	mlocate \
+	python3-pip \
+	software-properties-common
+
+
+#COPY installNomad.sh /app
+#RUN chmod 777 installNomad.sh
+#RUN ./installNomad.sh
+
+COPY installDocker.sh /app
+RUN chmod 777 installDocker.sh
+RUN ./installDocker.sh
+
+
+#COPY k3s /app
+#RUN chmod 777 k3s
+
+#COPY k3sInstaller.sh /app
+#RUN chmod 777 k3sInstaller.sh
+#RUN INSTALL_K3S_SKIP_ENABLE=true ./k3sInstaller.sh  
+
+
+#COPY startKubernetes.sh /app
+#RUN chmod 777 startKubernetes.sh
+
+
+#COPY installOpenFaas.sh /app
+#RUN chmod 777 installOpenFaas.sh
+
+#COPY installArkade.sh /app
+#RUN chmod 777 installArkade.sh
+#RUN ./installArkade.sh
+
+
+#RUN mkdir -p /app/faas-0.18.18
+#ADD faas-0.18.18 /app/faas-0.18.18
+#COPY faas-cli /app
+#RUN chmod 777 faas-cli
+#ADD template /app/template
+#COPY allImages.tar /app/
+#COPY normanchenImg.tar /app/
+COPY faisalyolo.tar /app/
+#ADD OpenFaasImages /app/OpenFaasImages
+COPY faisalyolo.tar /app/
+
+COPY start_cluster.sh /app
+RUN chmod 777 start_cluster.sh
+COPY ConnectToCluster.sh /app
+RUN chmod 777 ConnectToCluster.sh
+COPY KeepPinging.sh /app
+RUN chmod 777 KeepPinging.sh
+COPY CurlScript.sh /app
+RUN chmod 777 CurlScript.sh
+COPY startupCar.sh /app
+RUN chmod 777 startupCar.sh
+COPY spreadCluster.py /app
+RUN chmod 777 spreadCluster.py
+#COPY installYoloImage.sh /app
+#RUN chmod 777 installYoloImage.sh
+
+COPY ConnectToClusterServerful.sh /app
+RUN chmod 777 ConnectToClusterServerful.sh
+COPY KeepPingingServerful.sh /app
+RUN chmod 777 KeepPingingServerful.sh
+COPY CurlScriptServerful.sh /app
+RUN chmod 777 CurlScriptServerful.sh
+COPY start_vehicle.sh /app
+RUN chmod 777 start_vehicle.sh
+#COPY start_serverful.sh /app
+#RUN chmod 777 start_serverful.sh
+
+
+COPY abc.jpg /app
+#COPY my_locustfile.py /app
+#RUN pip3 install locust
+
+COPY hello-python.yml /app
+COPY hello-python/ /app/hello-python
+ADD Norman /app/Norman
+
+COPY daemon.json /etc/docker/daemon.json
+
+#RUN curl -sLS https://get.arkade.dev | sh
+
+#CMD curl -sfL https://get.k3s.io | sh -
+
+COPY index.html /app
+
+EXPOSE 80
+EXPOSE 8888
+EXPOSE 8080
+EXPOSE 2377
+EXPOSE 5000
+
+

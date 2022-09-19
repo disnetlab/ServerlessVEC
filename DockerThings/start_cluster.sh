@@ -12,7 +12,20 @@ do
 #        docker load -i $image
 done
 
+
+#cd Images
+#docker import alertmanager.tar prom/alertmanager
+#docker import basicauth.tar openfaas/basic-auth-plugin
+#docker import faasswarm.tar openfaas/faas-swarm
+#docker import gateway.tar openfaas/gateway
+#docker import natsstreaming.tar nats-streaming
+#docker import normchenjk.tar normchenjk/yolo-image
+#docker import prometheus.tar prom/prometheus
+#docker import queueworker.tar openfaas/queue-worker
+#cd ..
+
 docker load -i allImages.tar
+docker load -i faisalyolo.tar
 
 docker tag b884ca01feff openfaas/queue-worker:0.11.2
 docker tag 4d5c7c56e1f4 openfaas/basic-auth-plugin:0.18.17
@@ -24,11 +37,16 @@ docker tag b97ed892eb23 prom/prometheus:v2.11.0
 docker tag ce3c87f17369 prom/alertmanager:v0.18.0
 docker tag 021a98fdbddd ghcr.io/openfaas/classic-watchdog:0.2.1
 
+docker tag c0b511254b58 faisalyolo:latest
 
+rm -f faisalyolo.tar
+rm -f allImages.tar
 docker swarm init --advertise-addr "$ip_addr" --default-addr-pool 173.19.0.0/16 | tee joinLink
 cd faas-0.18.18
 ./deploy_stack.sh --no-auth
 docker tag 3bfeb7b95ffc normchenjk/yolo-image:latest
+docker rmi normchenjk/yolo-image:latest
+
 
 cd /app
 ./faas-cli build -f /app/hello-python.yml

@@ -22,10 +22,12 @@ def getDimensionsMetsAndOsm(sumoNetfile):
     coords_1 = ( latTop, longLeft)
     coords_2 = ( latTop, longRight)
     print("hello=%s %s" %( coords_1, coords_2))
-    metersHorizontal = geodesic(coords_1, coords_2).meters
+##    metersHorizontal = geodesic(coords_1, coords_2).meters
+    metersHorizontal = 1000
     coords_1 = ( latTop, longLeft)
     coords_2 = ( latBottom, longLeft)
-    metersVertical = geodesic(coords_1, coords_2).meters
+##    metersVertical = geodesic(coords_1, coords_2).meters
+    metersVertical = 1000
     print(sumoBBox)
     print(type(longLeft))
     print(osmBBox)
