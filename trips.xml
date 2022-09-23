@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- generated on 2022-09-17 07:26:33.831732 by randomTrips.py UNKNOWN
+<!-- generated on 2022-09-20 22:08:05.371547 by randomTrips.py UNKNOWN
 <configuration>
-    <end value="120"/>
-    <insertion-rate value="100.0"/>
+    <end value="300"/>
+    <insertion-rate value="120.0"/>
     <net-file value="melbcbd.net.xml"/>
     <route-file value="routes.rou.xml"/>
     <output-trip-file value="trips.xml"/>
@@ -12,7 +12,13 @@
 
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
     <trip id="0" depart="0.00" from="-E4" to="-E2"/>
-    <trip id="1" depart="36.00" from="-E3" to="-E2"/>
-    <trip id="2" depart="72.00" from="-E4" to="E3"/>
-    <trip id="3" depart="108.00" from="E2" to="-E2"/>
+    <trip id="1" depart="30.00" from="-E3" to="-E2"/>
+    <trip id="2" depart="60.00" from="-E4" to="E3"/>
+    <trip id="3" depart="90.00" from="E2" to="-E2"/>
+    <trip id="4" depart="120.00" from="-E3" to="-E2"/>
+    <trip id="5" depart="150.00" from="-E1" to="E3"/>
+    <trip id="6" depart="180.00" from="-E1" to="-E2"/>
+    <trip id="7" depart="210.00" from="-E4" to="E3"/>
+    <trip id="8" depart="240.00" from="-E1" to="E3"/>
+    <trip id="9" depart="270.00" from="E2" to="-E2"/>
 </routes>

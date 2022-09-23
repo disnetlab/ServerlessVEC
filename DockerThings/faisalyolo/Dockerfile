@@ -37,11 +37,9 @@ RUN apt-get -qy update
 # https://askubuntu.com/questions/1339558/cant-build-dockerfile-for-arm64-due-to-libc-bin-segmentation-fault
 RUN apt install -y libc-bin
 RUN apt install -y libgl1 libglib2.0-0 libsm6 libxrender1 libxext6
-RUN apt install -y net-tools iputils-ping curl ethtool iputils-ping iproute2
+RUN apt install -y net-tools iputils-ping curl ethtool iputils-ping iproute2 procps
 RUN chmod 777 -R /tmp
 COPY abc.jpg           .
-COPY coldStart.sh .
-RUN chmod 777 coldStart.sh
 
 RUN chown -R app:app *
 
@@ -74,7 +72,6 @@ WORKDIR /home/app/
 #USER root
 
 ENV fprocess="python index.py"
-#ENV fprocess="python -m http.server --bind 0.0.0.0 80"
 
 ENV cgi_headers="true"
 ENV mode="http"

@@ -57,7 +57,7 @@ RUN mkdir -p /app/faas-0.18.18
 ADD faas-0.18.18 /app/faas-0.18.18
 COPY faas-cli /app
 RUN chmod 777 faas-cli
-#ADD template /app/template
+ADD template /app/template
 COPY allImages.tar /app/
 #COPY normanchenImg.tar /app/
 COPY faisalyolo.tar /app/
@@ -78,7 +78,6 @@ COPY spreadCluster.py /app
 RUN chmod 777 spreadCluster.py
 COPY installYoloImage.sh /app
 RUN chmod 777 installYoloImage.sh
-ADD Images /app/Images
 
 COPY ConnectToClusterServerful.sh /app
 RUN chmod 777 ConnectToClusterServerful.sh

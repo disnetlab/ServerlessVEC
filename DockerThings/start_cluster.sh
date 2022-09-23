@@ -37,7 +37,7 @@ docker tag b97ed892eb23 prom/prometheus:v2.11.0
 docker tag ce3c87f17369 prom/alertmanager:v0.18.0
 docker tag 021a98fdbddd ghcr.io/openfaas/classic-watchdog:0.2.1
 
-docker tag c0b511254b58 faisalyolo:latest
+docker tag 78732ecd5be5 faisalyolo:latest
 
 rm -f faisalyolo.tar
 rm -f allImages.tar
@@ -46,16 +46,18 @@ cd faas-0.18.18
 ./deploy_stack.sh --no-auth
 docker tag 3bfeb7b95ffc normchenjk/yolo-image:latest
 docker rmi normchenjk/yolo-image:latest
+docker tag 78732ecd5be5 faisalyolo:latest
 
 
 cd /app
+docker tag 78732ecd5be5 faisalyolo:latest
 ./faas-cli build -f /app/hello-python.yml
-docker tag 3bfeb7b95ffc normchenjk/yolo-image:latest
 
 sleep 3
+docker tag 78732ecd5be5 faisalyolo:latest
 ./faas-cli deploy -f hello-python.yml
-docker tag 3bfeb7b95ffc normchenjk/yolo-image:latest
 
+docker service update --replicas-max-per-node 1 hello-python
 
 sleep 10
 curl -s --form "image_file=@abc.jpg"  http://172.18.5.12:8080/function/hello-python

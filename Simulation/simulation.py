@@ -100,9 +100,9 @@ class Simulation:
             if self.__isMnWifi:
                 ap = net.addAccessPoint('ap1', ssid='new-ssid', mode='n',ip=ip_addr, channel="10", protocols='OpenFlow13', datapath='kernel',
                                  failMode="standalone", mac=randomMac, 
-                                 position=pos, range=500)
+                                 position=pos, range=500)                
                 randomMac = getRandomMac()
-                attached_vm = net.addHost("D"+apname, mac=randomMac, ip = "172.18.5.12/24",cls=Docker, ports=[80,8888], mem_limit='2048m', dcmd='python -m http.server 5000' , dimage="server_example:latest")
+                attached_vm = net.addHost("D"+apname, mac=randomMac, ip = "172.18.5.12/24",cls=Docker, ports=[80,8888], mem_limit='4096m', dcmd='python -m http.server 5000' , dimage="server_example:latest")
                 access_points.append((ap,attached_vm))
         #Add stations for each car
         self.addAllCars()
@@ -155,9 +155,9 @@ class Simulation:
                 randomMac = getRandomMac()
                 ip_addr = getRandomIPAddress(self.__supportStaticVars)+"/24"
                 if self.__isMnWifi:
-                    car = self.__net.addStation("c"+vehicleId,mac=randomMac, mode='n', ip=ip_addr, cls=DockerSta, ports=[80,8888], mem_limit='512m', dcmd='./start_vehicle.sh', dimage="vehicle_example:latest", 
+                    car = self.__net.addStation("c"+vehicleId,mac=randomMac, mode='n', ip=ip_addr, cls=DockerSta, ports=[80,8888], mem_limit='1024m', dcmd='./start_vehicle.sh', dimage="vehicle_example:latest", 
                        position='0,0,0')
-##                    car.cmd('./start_vehicle.sh')
+                    car.cmd("""ip link set txqueuelen 100 dev `hostname`-wlan0""")
                     self.__carObjectDict[vehicleId] = car
                 if self.__isVisualisation:
                     col = self.__carColorDict[ vehicleId ]
@@ -170,16 +170,24 @@ class Simulation:
         win = self.__win
         connLines=[]
         podScrObj=[]
+        podCmdScrObj = ""
+        canvas = self.__canvas
         for timestep in range(len(self.__vehiclePositions)):
             count=count+1
-            if count > 10:
-                input()
+##            if count > 10:
+##                input()
             time.sleep(1)
             if self.__isVisualisation:
+                podNodes = self.getPodNodes()
+                if podCmdScrObj in canvas.find_all():
+                    canvas.delete(podCmdScrObj)
+##                podCmdScrObj=self.create_text(800, 800, podCmd)
+                podCmdScrObj = canvas.create_text((800,800),fill="darkblue",font="Times 8",
+                        text=str(podNodes))
                 for line in connLines:
-                    self.__canvas.delete(line)
+                    canvas.delete(line)
                 for nums in podScrObj:
-                    self.__canvas.delete(nums)
+                    canvas.delete(nums)
                 connLines=[]
                 podScrObj=[]
                 
@@ -223,7 +231,9 @@ class Simulation:
         #Remove all previous car objects
         kwargs = {'ssid': 'vanet-ssid', 'mode': 'g', 'passwd': '123456789a',
                   'encrypt': 'wpa2', 'failMode': 'standalone', 'datapath': 'user'}
+        print("==================Time Start======================== ")
         for vehicleId in curTimestep.keys():
+            print("Vehicle="+str(vehicleId))
             posX = float(curTimestep[vehicleId][0])
             posY = float(curTimestep[vehicleId][1])
             (metX, metY) = translateInMeters (posX, posY, self.__metersDim, self.__sumoBBox)
@@ -237,7 +247,7 @@ class Simulation:
                 print("---------------"+vehicleId+"-------------")
                 c="c"+str(vehicleId)
                 c1 = net.get(c)
-                print(c1.cmd("./ConnectToCluster.sh "+pos+" &"))
+                print(c1.cmd("./ConnectToCluster.sh "+str(pos)+" "+str(timestep)+" &"))
                 connectedMac = self.getConnectionState(car, vehicleId, connLines)
             if self.__isVisualisation:
                 ( screen_width, screen_height)  = self.__screenDim
@@ -259,6 +269,7 @@ class Simulation:
                     print("Create line = %d %d %d %d" %(scrX, scrY, jpX, jpY))
                     line=canvas.create_line(scrX, scrY, jpX, jpY)
                     connLines.append(line)
+        print("==================Time End======================== ")
                     
                     
     #This function returns the Mac address of the RSU AP, car is connected with     
@@ -275,7 +286,7 @@ class Simulation:
 
     def getPodNodes(self):
         apObj = self.__net.get("Dap1")
-        conncmd=apObj.cmd(""" docker service ps hello-python| awk '$6=="Running"'| awk '{print $4}'""")
+        conncmd=apObj.cmd("""docker service ps -f "desired-state=running" hello-python| awk  '$6=="Running"'| awk '{print $4}'""")
         nodeList = {}
         for node in conncmd.splitlines():
             node = node.strip()
@@ -288,7 +299,7 @@ class Simulation:
 
     def create_text(self, x,y, str):
         canvas = self.__canvas
-        obj=canvas.create_text((x,y),fill="darkblue",font="Times 20 italic bold",
+        obj=canvas.create_text((x,y-5),fill="darkblue",font="Times 15 italic bold",
                         text=str)
         return obj
         

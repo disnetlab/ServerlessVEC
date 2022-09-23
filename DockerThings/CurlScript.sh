@@ -8,7 +8,7 @@ TIMEFORMAT=%R
 
 serNo="$1"
 
-response="$(time (curl -s --form "image_file=@abc.jpg"  http://172.18.5.12:8080/function/hello-python) 2>timetemp)"
+response="$(time (curl -s --connect-timeout 1 --max-time 2 --form "image_file=@abc.jpg"  http://172.18.5.12:8080/function/hello-python) 2>timetemp)"
 if [ -z "$response" ]
 then
         response="Unsucc"
@@ -33,6 +33,11 @@ fi
 position=$(head -n 1 PositionFile)
 #echo "$position"
 
+timestep=$(head -n 1 TimestepFile)
+#echo "$timestep"
+
+hostname=$(hostname)
+
 
 swarmStatus=$(docker info 2>/dev/null| grep Swarm| awk '{print $NF}')
 #echo "$swarmStatus"
@@ -40,5 +45,5 @@ swarmStatus=$(docker info 2>/dev/null| grep Swarm| awk '{print $NF}')
 position=$(sed 's/,/;/g' <<<"$position")
 mytime=$(sed 's/,/;/g' <<<"$mytime")
 response=$(sed 's/,/;/g' <<<"$response")
-echo "${serNo},${status},${swarmStatus},${position}, ${response}, ${mytime}"
+echo "${serNo},${hostname}, ${status},${swarmStatus},${position}, ${response}, ${timestep}, ${mytime}"
 

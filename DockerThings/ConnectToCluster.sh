@@ -14,6 +14,17 @@ interface="`hostname`-wlan0"
 position="$1"
 echo "$position">PositionFile
 
+if [[ "$2" == "stop" ]];
+then
+        pid=$(ps aux| grep KeepPinging| grep -v grep| awk '{print $2}')
+        kill -9 "$pid"
+	date>>test
+	exit 0
+fi
+
+timestep="$2"
+echo "$timestep">TimestepFile
+
 
 #Check if node connected with RSU
 status=$(iw dev "$interface" link| head -n1| awk '{print $1;}')
@@ -40,10 +51,4 @@ then
         fi
 fi
 
-if [[ "$2" == "stop" ]];
-then
-        pid=$(ps aux| grep KeepPinging| grep -v grep| awk '{print $2}')
-        kill -9 "$pid"
-	date>>test
-fi
 

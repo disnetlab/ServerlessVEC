@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- generated on 2022-09-17 07:26:33.919754 by randomTrips.py UNKNOWN
+<!-- generated on 2022-09-20 22:08:05.398416 by randomTrips.py UNKNOWN
 <configuration>
-    <end value="120"/>
-    <insertion-rate value="100.0"/>
+    <end value="300"/>
+    <insertion-rate value="120.0"/>
     <net-file value="melbcbd.net.xml"/>
     <route-file value="routes.rou.xml"/>
     <output-trip-file value="trips.xml"/>
 </configuration>
 -->
 
-<!-- generated on 2022-09-17 07:26:33 by Eclipse SUMO duarouter Version 1.14.1
+<!-- generated on 2022-09-20 22:08:05 by Eclipse SUMO duarouter Version 1.14.1
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/duarouterConfiguration.xsd">
 
     <input>
@@ -25,7 +25,7 @@
 
     <time>
         <begin value="0"/>
-        <end value="120"/>
+        <end value="300"/>
     </time>
 
     <report>
@@ -41,10 +41,25 @@
     <vehicle id="0" depart="0.00">
         <route edges="-E4 -E2"/>
     </vehicle>
-    <vehicle id="1" depart="36.00">
+    <vehicle id="1" depart="30.00">
         <route edges="-E3 -E2"/>
     </vehicle>
-    <vehicle id="2" depart="72.00">
+    <vehicle id="2" depart="60.00">
         <route edges="-E4 E3"/>
+    </vehicle>
+    <vehicle id="4" depart="120.00">
+        <route edges="-E3 -E2"/>
+    </vehicle>
+    <vehicle id="5" depart="150.00">
+        <route edges="-E1 E3"/>
+    </vehicle>
+    <vehicle id="6" depart="180.00">
+        <route edges="-E1 -E2"/>
+    </vehicle>
+    <vehicle id="7" depart="210.00">
+        <route edges="-E4 E3"/>
+    </vehicle>
+    <vehicle id="8" depart="240.00">
+        <route edges="-E1 E3"/>
     </vehicle>
 </routes>
