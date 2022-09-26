@@ -1,0 +1,2 @@
+#This file does not have all OPenFaas Images but just normanchenYolo Image
+sudo docker build -t faisalyolo --force-rm=true --squash -f Dockerfile .

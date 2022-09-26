@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-echo "" > PingLogs
 if mkdir -- lock 2>/dev/null
 then
+	echo "" > PingLogs
 	count=0
 	while true
 	do

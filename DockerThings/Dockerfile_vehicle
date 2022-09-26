@@ -57,9 +57,10 @@ RUN ./installDocker.sh
 #ADD template /app/template
 #COPY allImages.tar /app/
 #COPY normanchenImg.tar /app/
-COPY faisalyolo.tar /app/
+#COPY faisalyolo.tar /app/
 #ADD OpenFaasImages /app/OpenFaasImages
-COPY faisalyolo.tar /app/
+#COPY faisalyolo.tar /app/
+COPY reqmediator.tar /app/
 
 COPY start_cluster.sh /app
 RUN chmod 777 start_cluster.sh

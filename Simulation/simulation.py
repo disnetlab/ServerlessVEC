@@ -99,10 +99,10 @@ class Simulation:
             ip_addr = getRandomIPAddress(self.__supportStaticVars)+"/24"
             if self.__isMnWifi:
                 ap = net.addAccessPoint('ap1', ssid='new-ssid', mode='n',ip=ip_addr, channel="10", protocols='OpenFlow13', datapath='kernel',
-                                 failMode="standalone", mac=randomMac, 
-                                 position=pos, range=500)                
+                                 failMode="standalone", mac=randomMac, labels=['accesspoint'], 
+                                 position=pos, range=1000)                
                 randomMac = getRandomMac()
-                attached_vm = net.addHost("D"+apname, mac=randomMac, ip = "172.18.5.12/24",cls=Docker, ports=[80,8888], mem_limit='4096m', dcmd='python -m http.server 5000' , dimage="server_example:latest")
+                attached_vm = net.addHost("D"+apname, mac=randomMac, ip = "172.18.5.12/24",cls=Docker, ports=[80,8888], mem_limit='6000m', dcmd='python -m http.server 5000' , dimage="server_example:latest")
                 access_points.append((ap,attached_vm))
         #Add stations for each car
         self.addAllCars()
@@ -130,6 +130,7 @@ class Simulation:
                 aps[0].start([self.__controller])
             net.start()
             attached_vm.cmd('./start_cluster.sh')
+##            input()
             if self.__isVisualisation:
                 self.__win.update_idletasks()
                 self.__win.update()
@@ -172,13 +173,16 @@ class Simulation:
         podScrObj=[]
         podCmdScrObj = ""
         canvas = self.__canvas
+        fp = open('numPods', 'w')
         for timestep in range(len(self.__vehiclePositions)):
             count=count+1
 ##            if count > 10:
 ##                input()
             time.sleep(1)
+            podNodes = self.getPodNodes()
+            numPods = sum([podNodes[x] for x in podNodes.keys()])
+            fp.write(str(timestep)+","+str(numPods)+"\n")
             if self.__isVisualisation:
-                podNodes = self.getPodNodes()
                 if podCmdScrObj in canvas.find_all():
                     canvas.delete(podCmdScrObj)
 ##                podCmdScrObj=self.create_text(800, 800, podCmd)
@@ -195,6 +199,7 @@ class Simulation:
             if self.__isVisualisation:
                 win.update_idletasks()
                 win.update()
+        fp.close()
 
     def simulateTrafficHelp(self, timestep, junctionsPosition, connLines, podScrObj):
         screenObjectsDict = self.__screenObjectsDict
@@ -307,7 +312,7 @@ class Simulation:
         
 if __name__ == "__main__":
     setLogLevel('info')
-    os.system('./deleteDockers.sh')
+    #os.system('./deleteDockers.sh')
     # Get the parameters
     sumoTracefile = sys.argv[1]
     sumoNetfile = sys.argv[2]

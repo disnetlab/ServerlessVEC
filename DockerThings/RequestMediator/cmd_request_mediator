@@ -1,1 +1,1 @@
-sudo docker build -t req_mediator --force-rm=true --squash -f Dockerfile .
+sudo docker build -t reqmediator:latest -f Dockerfile .
