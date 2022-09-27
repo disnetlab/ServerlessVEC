@@ -8,7 +8,7 @@ TIMEFORMAT=%R
 
 serNo="$1"
 
-response="$(time (curl -s --connect-timeout 1 --max-time 10 --form "image_file=@abc.jpg"  http://172.18.5.12:8080/function/hello-python) 2>timetemp)"
+response="$(time (curl -s --max-time 3 --form "image_file=@abc.jpg"  http://172.18.5.12:8080/function/hello-python) 2>timetemp)"
 if [ -z "$response" ]
 then
         response="Unsucc"

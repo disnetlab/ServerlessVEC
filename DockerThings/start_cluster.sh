@@ -68,7 +68,7 @@ docker tag f1bf042e2f06 reqmediator:latest
 #docker node update --label-add accesspoint Dap1
 #docker service update --placement-pref-add spread=node.labels.accesspoint hello-python
 #docker service update --force --update-order start-first hello-python
-docker service update --force --update-order start-first --health-interval 1s --health-retries 2 --health-start-period 1s --health-timeout 1s --update-parallelism 5 --update-delay 1s hello-python
+docker service update --force --update-order start-first --health-interval 1s --health-retries 2 --health-start-period 1s --health-timeout 1s --update-parallelism 5 --update-delay 1s --task-history-limit 0 hello-python
 
 
 sleep 10

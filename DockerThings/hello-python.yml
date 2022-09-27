@@ -9,19 +9,19 @@ functions:
     image: reqmediator:latest
     limits:
       cpu: "300m"
-      memory: "350Mi"
+      memory: "230Mi"
     labels:
       com.openfaas.scale.min: "2"
       com.openfaas.scale.max: "5"
       com.openfaas.scale.type: "rps"
       com.openfaas.scale.target: "1"
       com.openfaas.scale.target-proportion: "0.9"
-    read_timeout: "10s"  # default is 5s, Maximum time to read HTTP request
-    write_timeout: "10s"  # default is 5s, Maximum time to write HTTP response
-    upstream_timeout: "11s" # Maximum duration of upstream function call
-    exec_timeout: "10s"
+    read_timeout: "3s"  # default is 5s, Maximum time to read HTTP request
+    write_timeout: "3s"  # default is 5s, Maximum time to write HTTP response
+    upstream_timeout: "3s" # Maximum duration of upstream function call
+    exec_timeout: "3s"
     environment:
-      read_timeout: "10s"  # default is 5s, Maximum time to read HTTP request
-      write_timeout: "10s"  # default is 5s, Maximum time to write HTTP response
-      upstream_timeout: "11s" # Maximum duration of upstream function call
-      exec_timeout: "10s"
+      read_timeout: "3s"  # default is 5s, Maximum time to read HTTP request
+      write_timeout: "3s"  # default is 5s, Maximum time to write HTTP response
+      upstream_timeout: "3s" # Maximum duration of upstream function call
+      exec_timeout: "4s"

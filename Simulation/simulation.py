@@ -157,7 +157,7 @@ class Simulation:
                 ip_addr = getRandomIPAddress(self.__supportStaticVars)+"/24"
                 if self.__isMnWifi:
                     car = self.__net.addStation("c"+vehicleId,mac=randomMac, mode='n', ip=ip_addr, cls=DockerSta, ports=[80,8888], mem_limit='1024m', dcmd='./start_vehicle.sh', dimage="vehicle_example:latest", 
-                       position='0,0,0')
+                       position='10000,10000,10000')
                     car.cmd("""ip link set txqueuelen 100 dev `hostname`-wlan0""")
                     self.__carObjectDict[vehicleId] = car
                 if self.__isVisualisation:
@@ -181,7 +181,8 @@ class Simulation:
             time.sleep(1)
             podNodes = self.getPodNodes()
             numPods = sum([podNodes[x] for x in podNodes.keys()])
-            fp.write(str(timestep)+","+str(numPods)+"\n")
+            numVehicles = len(self.__vehiclePositions[timestep].keys())
+            fp.write(str(timestep)+","+str(numPods)+","+str(numVehicles)+"\n")
             if self.__isVisualisation:
                 if podCmdScrObj in canvas.find_all():
                     canvas.delete(podCmdScrObj)
@@ -226,13 +227,14 @@ class Simulation:
             print("Move %s to 000" %(vehicleId))
             if self.__isMnWifi:
                 mininetCar = carObjectDict[ vehicleId ]
-                mininetCar.setPosition('0,0,0')
+                mininetCar.setPosition('10000,10000,10000')
             if self.__isVisualisation:
                 canvas.delete(self.__screenObjectsDict[ vehicleId ])
             if self.__isMnWifi:
                 c="c"+str(vehicleId)
                 car = net.get(c)
-                print(car.cmd("./ConnectToCluster.sh 0,0,0 stop"+" &"))
+                car.cmd("docker swarm leave")
+                print(car.cmd("./ConnectToCluster.sh 10000,10000,10000 stop"+" &"))
         #Remove all previous car objects
         kwargs = {'ssid': 'vanet-ssid', 'mode': 'g', 'passwd': '123456789a',
                   'encrypt': 'wpa2', 'failMode': 'standalone', 'datapath': 'user'}
