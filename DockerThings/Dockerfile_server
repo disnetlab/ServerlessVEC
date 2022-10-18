@@ -21,6 +21,7 @@ RUN apt update && apt upgrade -y && apt install -y \
 	vim \
 	mlocate \
 	python3-pip \
+	bc \
 	software-properties-common
 
 
@@ -87,6 +88,8 @@ COPY CurlScriptServerful.sh /app
 RUN chmod 777 CurlScriptServerful.sh
 COPY start_vehicle.sh /app
 RUN chmod 777 start_vehicle.sh
+COPY removeNodes.sh /app
+RUN chmod 777 removeNodes.sh
 #COPY start_serverful.sh /app
 #RUN chmod 777 start_serverful.sh
 

@@ -18,6 +18,7 @@ RUN apt update && apt upgrade -y && apt install -y \
 	mlocate \
 	vim \
 	python3-pip \
+	bc \
 	software-properties-common
 
 

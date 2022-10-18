@@ -8,17 +8,23 @@ TIMEFORMAT=%R
 
 serNo="$1"
 
-response="$(time (curl -s --max-time 3 --form "image_file=@abc.jpg"  http://172.18.5.12:8080/function/hello-python) 2>timetemp)"
-if [ -z "$response" ]
+timestampbefore=$(date +%s%3N)
+start_time=$(date +%s.%3N)
+response=$(curl -s --max-time 3 --form "image_file=@abc.jpg"  http://172.18.5.12:8080/function/hello-python 2>&1)
+end_time=$(date +%s.%3N)
+timestampafter=$(date +%s%3N)
+temp_response="$(echo ${response}| grep confidence)"
+if [ -z "$temp_response" ]
 then
-        response="Unsucc"
+        response1="Unsucc"
 else
-        response="Succesful"
+        response1="Succesful"
 fi
 
 #echo "$mytime"
 
-mytime=$(head -n 1 timetemp)
+elapsed=$(echo "scale=3; $end_time - $start_time" | bc)
+#mytime=$(head -n 1 timetemp)
 #echo "$mytime"
 
 
@@ -43,7 +49,9 @@ swarmStatus=$(docker info 2>/dev/null| grep Swarm| awk '{print $NF}')
 #echo "$swarmStatus"
 
 position=$(sed 's/,/;/g' <<<"$position")
-mytime=$(sed 's/,/;/g' <<<"$mytime")
+elapsed=$(sed 's/,/;/g' <<<"$elapsed")
 response=$(sed 's/,/;/g' <<<"$response")
-echo "${serNo},${hostname}, ${status},${swarmStatus},${position}, ${response}, ${timestep}, ${mytime}"
+
+echo "${serNo}, ${response}","==============" >> responseLogs
+echo "${serNo},${hostname}, ${status},${swarmStatus},${position},  ${timestep}, ${timestampbefore}, ${timestampafter}, ${elapsed}, ${response1}"
 

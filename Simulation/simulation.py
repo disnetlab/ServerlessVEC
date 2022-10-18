@@ -93,7 +93,6 @@ class Simulation:
                 canvas.create_rectangle(scrX, scrY, scrX+10, scrY+10,
                                     outline="#000", fill="#000")
                 junctionsPosition[randomMac] = (scrX,scrY)
-
             pos = ','.join([str(x) for x in [metX, metY, 5]])
             apname = "ap"+str(count+1)
             ip_addr = getRandomIPAddress(self.__supportStaticVars)+"/24"
@@ -174,15 +173,19 @@ class Simulation:
         podCmdScrObj = ""
         canvas = self.__canvas
         fp = open('numPods', 'w')
+        fp_detail = open('numPods_detail', 'w')
         for timestep in range(len(self.__vehiclePositions)):
             count=count+1
-##            if count > 10:
+##            if count > 85:
 ##                input()
             time.sleep(1)
             podNodes = self.getPodNodes()
             numPods = sum([podNodes[x] for x in podNodes.keys()])
             numVehicles = len(self.__vehiclePositions[timestep].keys())
+            temp = [str(x)+":"+str(podNodes[x]) for x in podNodes.keys()]
+            podStr=";".join(temp)
             fp.write(str(timestep)+","+str(numPods)+","+str(numVehicles)+"\n")
+            fp_detail.write(str(timestep)+","+str(podStr)+"\n")
             if self.__isVisualisation:
                 if podCmdScrObj in canvas.find_all():
                     canvas.delete(podCmdScrObj)
@@ -196,13 +199,14 @@ class Simulation:
                 connLines=[]
                 podScrObj=[]
                 
-            self.simulateTrafficHelp(timestep, junctionsPosition, connLines, podScrObj)
+            self.simulateTrafficHelp(timestep, junctionsPosition, connLines, podScrObj, podNodes)
             if self.__isVisualisation:
                 win.update_idletasks()
                 win.update()
         fp.close()
+        fp_detail.close()
 
-    def simulateTrafficHelp(self, timestep, junctionsPosition, connLines, podScrObj):
+    def simulateTrafficHelp(self, timestep, junctionsPosition, connLines, podScrObj, podNodes):
         screenObjectsDict = self.__screenObjectsDict
         vehiclePositions = self.__vehiclePositions
         carObjectDict = self.__carObjectDict
@@ -210,31 +214,31 @@ class Simulation:
         canvas = self.__canvas
         win = self.__win
         curTimestep = vehiclePositions [ timestep ]
-        podNodes = self.getPodNodes()
+##        podNodes = self.getPodNodes()
         print("podNodes=%s" %podNodes)
-        if "Dap1" in podNodes:
-            print("Pod found on Dap1")
-            junctionPos = junctionsPosition[list(junctionsPosition.keys())[0]]
-            num = podNodes['Dap1']
-            podNum = self.create_text(junctionPos[0], junctionPos[1], num)
-            podScrObj.append(podNum)
+        if self.__isVisualisation:
+            if "Dap1" in podNodes:
+                print("Pod found on Dap1")
+                junctionPos = junctionsPosition[list(junctionsPosition.keys())[0]]
+                num = podNodes['Dap1']
+                podNum = self.create_text(junctionPos[0], junctionPos[1], num)
+                podScrObj.append(podNum)
         if(timestep == 0):
             prevTimestep = {}
         else:
             prevTimestep = vehiclePositions [ timestep-1 ]
         #Delete vehicle , move to 0,0,0,
-        for vehicleId in [x for x in prevTimestep.keys() if x not in curTimestep.keys()]:
+        for vehicleId in [x for x in prevTimestep.keys() if x not in curTimestep.keys()] :
             print("Move %s to 000" %(vehicleId))
             if self.__isMnWifi:
-                mininetCar = carObjectDict[ vehicleId ]
-                mininetCar.setPosition('10000,10000,10000')
+                car = carObjectDict[ vehicleId ]
+##                car.cmd("docker swarm leave &")
+                print(car.cmd("./ConnectToCluster.sh 10000,10000,10000 stop"+" &"))
+                car.setPosition('10000,10000,10000')
             if self.__isVisualisation:
                 canvas.delete(self.__screenObjectsDict[ vehicleId ])
-            if self.__isMnWifi:
-                c="c"+str(vehicleId)
-                car = net.get(c)
-                car.cmd("docker swarm leave")
-                print(car.cmd("./ConnectToCluster.sh 10000,10000,10000 stop"+" &"))
+                
+                
         #Remove all previous car objects
         kwargs = {'ssid': 'vanet-ssid', 'mode': 'g', 'passwd': '123456789a',
                   'encrypt': 'wpa2', 'failMode': 'standalone', 'datapath': 'user'}
@@ -247,7 +251,6 @@ class Simulation:
             pos = ','.join([str(x) for x in [metX, metY, 0]])
             print("Move==="+vehicleId+"=="+pos)
             connectedMac=""
-
             if self.__isMnWifi:
                 car = carObjectDict[ vehicleId ]
                 car.setPosition(pos)
@@ -293,7 +296,9 @@ class Simulation:
 
     def getPodNodes(self):
         apObj = self.__net.get("Dap1")
-        conncmd=apObj.cmd("""docker service ps -f "desired-state=running" hello-python| awk  '$6=="Running"'| awk '{print $4}'""")
+        #conncmd=apObj.cmd("""timeout 0.3 docker service ps -f "desired-state=running" hello-python| awk  '$6=="Running"'| awk '{print $4}'""")
+        conncmd=apObj.cmd("""timeout 0.3 docker service ps -f "desired-state=running" --format "{{.Node}}{{.CurrentState}}" hello-python| awk '{print $1}'| grep Running| sed 's/Running/ /'""")
+        print("PodsCommandOutput="+str(conncmd))
         nodeList = {}
         for node in conncmd.splitlines():
             node = node.strip()
@@ -302,6 +307,7 @@ class Simulation:
             else:
                 nodeList[node] = nodeList[node] +1
 
+        print("NodeList="+str(nodeList))
         return nodeList
 
     def create_text(self, x,y, str):
