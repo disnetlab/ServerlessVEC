@@ -96,13 +96,13 @@ class Simulation:
             pos = ','.join([str(x) for x in [metX, metY, 5]])
             apname = "ap"+str(count+1)
             ip_addr = getRandomIPAddress(self.__supportStaticVars)+"/24"
-            if self.__isMnWifi:
-                ap = net.addAccessPoint('ap1', ssid='new-ssid', mode='n',ip=ip_addr, channel="10", protocols='OpenFlow13', datapath='kernel',
-                                 failMode="standalone", mac=randomMac, labels=['accesspoint'], 
-                                 position=pos, range=1000)                
-                randomMac = getRandomMac()
-                attached_vm = net.addHost("D"+apname, mac=randomMac, ip = "172.18.5.12/24",cls=Docker, ports=[80,8888], mem_limit='6000m', dcmd='python -m http.server 5000' , dimage="server_example:latest")
-                access_points.append((ap,attached_vm))
+        if self.__isMnWifi:
+            ap = net.addAccessPoint('ap1', ssid='new-ssid', mode='n',ip=ip_addr, channel="10", protocols='OpenFlow13', datapath='kernel',
+                             failMode="standalone", mac=randomMac, labels=['accesspoint'], 
+                             position=pos, range=1000)                
+            randomMac = getRandomMac()
+            attached_vm = net.addHost("Dap1", mac=randomMac, ip = "172.18.5.12/24",cls=Docker, ports=[80,8888], mem_limit='6000m', dcmd='python -m http.server 5000' , dimage="server_example:latest")
+            access_points.append((ap,attached_vm))
         #Add stations for each car
         self.addAllCars()
         if self.__isMnWifi:
@@ -128,7 +128,8 @@ class Simulation:
             for aps in access_points:
                 aps[0].start([self.__controller])
             net.start()
-            attached_vm.cmd('./start_cluster.sh')
+            attached_vm.cmd('./start_cluster.sh') 
+##            attached_vm.cmd('./start_singlepod.sh') 
 ##            input()
             if self.__isVisualisation:
                 self.__win.update_idletasks()
@@ -155,7 +156,7 @@ class Simulation:
                 randomMac = getRandomMac()
                 ip_addr = getRandomIPAddress(self.__supportStaticVars)+"/24"
                 if self.__isMnWifi:
-                    car = self.__net.addStation("c"+vehicleId,mac=randomMac, mode='n', ip=ip_addr, cls=DockerSta, ports=[80,8888], mem_limit='1024m', dcmd='./start_vehicle.sh', dimage="vehicle_example:latest", 
+                    car = self.__net.addStation("c"+vehicleId,mac=randomMac, mode='n', ip=ip_addr, cls=DockerSta, ports=[80,8888], mem_limit='250m', dcmd='./start_vehicle.sh', dimage="vehicle_example:latest", 
                        position='10000,10000,10000')
                     car.cmd("""ip link set txqueuelen 100 dev `hostname`-wlan0""")
                     self.__carObjectDict[vehicleId] = car
@@ -179,25 +180,31 @@ class Simulation:
 ##            if count > 85:
 ##                input()
             time.sleep(1)
-            podNodes = self.getPodNodes()
-            numPods = sum([podNodes[x] for x in podNodes.keys()])
-            numVehicles = len(self.__vehiclePositions[timestep].keys())
-            temp = [str(x)+":"+str(podNodes[x]) for x in podNodes.keys()]
-            podStr=";".join(temp)
-            fp.write(str(timestep)+","+str(numPods)+","+str(numVehicles)+"\n")
-            fp_detail.write(str(timestep)+","+str(podStr)+"\n")
+            if self.__isMnWifi:
+                podNodes = self.getPodNodes()
+                numPods = sum([podNodes[x] for x in podNodes.keys()])
+                numVehicles = len(self.__vehiclePositions[timestep].keys())
+                temp = [str(x)+":"+str(podNodes[x]) for x in podNodes.keys()]
+                podStr=";".join(temp)
+                fp.write(str(timestep)+","+str(numPods)+","+str(numVehicles)+"\n")
+                fp_detail.write(str(timestep)+","+str(podStr)+"\n")
             if self.__isVisualisation:
                 if podCmdScrObj in canvas.find_all():
                     canvas.delete(podCmdScrObj)
 ##                podCmdScrObj=self.create_text(800, 800, podCmd)
-                podCmdScrObj = canvas.create_text((800,800),fill="darkblue",font="Times 8",
-                        text=str(podNodes))
+                if self.__isMnWifi:
+                    podCmdScrObj = canvas.create_text((800,800),fill="darkblue",font="Times 8",
+                            text=str(podNodes))
                 for line in connLines:
                     canvas.delete(line)
-                for nums in podScrObj:
-                    canvas.delete(nums)
+                if self.__isMnWifi:
+                    for nums in podScrObj:
+                        canvas.delete(nums)
                 connLines=[]
                 podScrObj=[]
+
+            if not self.__isMnWifi:
+                podNodes = {}
                 
             self.simulateTrafficHelp(timestep, junctionsPosition, connLines, podScrObj, podNodes)
             if self.__isVisualisation:
@@ -259,6 +266,8 @@ class Simulation:
                 c1 = net.get(c)
                 print(c1.cmd("./ConnectToCluster.sh "+str(pos)+" "+str(timestep)+" &"))
                 connectedMac = self.getConnectionState(car, vehicleId, connLines)
+            else:
+                c=""
             if self.__isVisualisation:
                 ( screen_width, screen_height)  = self.__screenDim
                 (scrX, scrY) = translateToScreen (posX, posY, self.__screenDim, self.__sumoBBox)

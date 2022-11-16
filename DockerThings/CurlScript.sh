@@ -10,7 +10,8 @@ serNo="$1"
 
 timestampbefore=$(date +%s%3N)
 start_time=$(date +%s.%3N)
-response=$(curl -s --max-time 3 --form "image_file=@abc.jpg"  http://172.18.5.12:8080/function/hello-python 2>&1)
+#response=$(curl -s --max-time 3 --form "image_file=@abc.jpg"  http://172.18.5.12:8080/function/hello-python 2>&1)
+response=$(curl -s --max-time 3 --form "image_file=@abc.jpg"  http://172.18.5.12:8080 2>&1)
 end_time=$(date +%s.%3N)
 timestampafter=$(date +%s%3N)
 temp_response="$(echo ${response}| grep confidence)"
